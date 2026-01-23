@@ -1,1 +1,1 @@
-# PhDWorks
+# multiPhysicsSWInterFoam
