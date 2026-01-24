@@ -1,0 +1,15 @@
+btAlignedAllocator.cpp
+btConvexHull.cpp
+btConvexHullComputer.cpp
+btGeometryUtil.cpp
+btPolarDecomposition.cpp
+btQuickprof.cpp
+btReducedVector.cpp
+btSerializer.cpp
+btSerializer64.cpp
+btThreads.cpp
+btVector3.cpp
+TaskScheduler/btTaskScheduler.cpp
+TaskScheduler/btThreadSupportPosix.cpp
+
+LIB = $(FOAM_USER_LIBBIN)/libLinearMath

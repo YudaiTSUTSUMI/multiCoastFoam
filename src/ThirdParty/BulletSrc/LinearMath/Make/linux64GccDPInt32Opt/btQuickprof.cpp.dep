@@ -1,0 +1,8 @@
+$(OBJECTS_DIR)/btQuickprof.cpp.dep: \
+btQuickprof.cpp \
+btQuickprof.h \
+btScalar.h \
+btAlignedAllocator.h \
+btThreads.h \
+
+#END

@@ -1,0 +1,10 @@
+$(OBJECTS_DIR)/btConvexHullComputer.cpp.dep: \
+btConvexHullComputer.cpp \
+btConvexHullComputer.h \
+btVector3.h \
+btScalar.h \
+btMinMax.h \
+btAlignedAllocator.h \
+btAlignedObjectArray.h \
+
+#END

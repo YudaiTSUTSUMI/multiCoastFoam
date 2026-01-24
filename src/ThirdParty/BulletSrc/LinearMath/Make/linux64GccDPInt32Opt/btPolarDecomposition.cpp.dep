@@ -1,0 +1,12 @@
+$(OBJECTS_DIR)/btPolarDecomposition.cpp.dep: \
+btPolarDecomposition.cpp \
+btPolarDecomposition.h \
+btMatrix3x3.h \
+btVector3.h \
+btScalar.h \
+btMinMax.h \
+btAlignedAllocator.h \
+btQuaternion.h \
+btQuadWord.h \
+
+#END

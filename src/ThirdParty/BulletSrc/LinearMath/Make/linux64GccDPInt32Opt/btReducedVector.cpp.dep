@@ -1,0 +1,13 @@
+$(OBJECTS_DIR)/btReducedVector.cpp.dep: \
+btReducedVector.cpp \
+btReducedVector.h \
+btVector3.h \
+btScalar.h \
+btMinMax.h \
+btAlignedAllocator.h \
+btMatrix3x3.h \
+btQuaternion.h \
+btQuadWord.h \
+btAlignedObjectArray.h \
+
+#END

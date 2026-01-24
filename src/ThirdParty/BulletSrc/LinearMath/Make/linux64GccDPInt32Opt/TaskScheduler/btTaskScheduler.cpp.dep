@@ -1,0 +1,11 @@
+$(OBJECTS_DIR)/TaskScheduler/btTaskScheduler.cpp.dep: \
+TaskScheduler/btTaskScheduler.cpp \
+../LinearMath/btMinMax.h \
+btScalar.h \
+../LinearMath/btAlignedObjectArray.h \
+btAlignedAllocator.h \
+../LinearMath/btThreads.h \
+../LinearMath/btQuickprof.h \
+TaskScheduler/btThreadSupportInterface.h \
+
+#END
