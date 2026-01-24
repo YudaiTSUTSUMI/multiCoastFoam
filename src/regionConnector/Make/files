@@ -1,0 +1,7 @@
+connectors/SWVOFFixedConnector.C
+connectors/SWVOFArbitraryConnector.C
+connectors/VOFLaplacianConnector.C
+
+regionConnector.C
+
+LIB = $(FOAM_USER_LIBBIN)/libregionConnector
