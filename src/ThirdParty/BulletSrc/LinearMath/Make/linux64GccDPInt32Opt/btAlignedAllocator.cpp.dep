@@ -1,6 +1,0 @@
-$(OBJECTS_DIR)/btAlignedAllocator.cpp.dep: \
-btAlignedAllocator.cpp \
-btAlignedAllocator.h \
-btScalar.h \
-
-#END

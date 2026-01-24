@@ -1,4 +1,0 @@
-$(OBJECTS_DIR)/btSerializer64.cpp.dep: \
-btSerializer64.cpp \
-
-#END

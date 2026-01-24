@@ -1,8 +1,0 @@
-$(OBJECTS_DIR)/btThreads.cpp.dep: \
-btThreads.cpp \
-btThreads.h \
-btScalar.h \
-btQuickprof.h \
-btAlignedAllocator.h \
-
-#END
