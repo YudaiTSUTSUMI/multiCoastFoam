@@ -27,18 +27,18 @@ objects
         objName         floor;
         objShape        box;
         
-        Lx      100;
-        Ly      100;
-        Lz      100;
+        Lx      10;
+        Ly      10;
+        Lz      10;
         
-        position    (0 0 -50.1); 
+        position    (0 0 -5.1); 
         
         rhoSolid        0; // staticBody
         
         restitution     0.0;
         friction      0.5;
         
-        writeVTK    true;
+        writeVTK    true; //defalt
     }
     
     box
@@ -54,13 +54,13 @@ objects
         Lz              0.15;
 
         // Density of the solid
-        rhoSolid        1e-6;//0.00000001;//200;
+        rhoSolid        1e-6; // to keep dynamic
         
         restitution     0.0;
         friction      0.5;
         
         fluidForceRelaxation 0.6;
-        fluidForceDamping    1;//0.9;
+        fluidForceDamping    1;
         
         initialVelocity     (0 0 2);
         initialAngularVelocity   (0 21.98 0);
@@ -70,20 +70,17 @@ objects
              /*planeConstraint
              {
                bulletMotionConstraint   plane;
-               normal                   (0 0 0);
-               //normal                   (1 0 1);
+               normal                   (1 0 1);
              }*/
              
              /*axisConstraint
              {
                bulletMotionConstraint   axis;
-               axis                              (0 0 0);
-               //axis                              (0 1 0);
+               axis                              (0 1 0);
              }*/  
         }
         
         writeVTK    true;
-        triSurface  turbine.stl;
     }
 }
 
@@ -95,17 +92,6 @@ joints
         obj cylinder;
         pivot (0 0 0); //local value
         axis (0 1 0);
-    }*/
-    
-    /*hinge2
-    {
-        type          hingePair;
-        objA         box;
-        objB         box2;
-        pivotA        (0 0 0);     
-        pivotB        (0 0 -0.135);        
-        axisA         (0 1 0);       
-        axisB         (0 1 0);
     }*/
 }
 
