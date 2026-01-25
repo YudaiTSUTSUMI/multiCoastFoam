@@ -98,10 +98,6 @@ Foam::labelList Foam::VOFLaplacianConnector::generateGlobalIDs
 }
 
 
-// * * * * * * * * * * * * * * * * Update Functions  * * * * * * * * * * * * * * //
-
-
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 
