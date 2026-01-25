@@ -689,47 +689,44 @@ int Foam::physicsManager::getObjectID(word objName)
 
 void Foam::physicsManager::prepareCSV()
 {
-    if(Pstream::master())
+    forAll(objectDataList_, objI)
     {
-        forAll(objectDataList_, objI)
-        {
-            objectData& objectData = objectDataList_[objI];
+        objectData& objectData = objectDataList_[objI];
+        
+        const word objName = objectData.objName_;
+    
+        objectData.stateCSV_.reset(new OFstream("Bullet/" + objName + "State.csv"));
+        OFstream& stateCSV = *objectData.stateCSV_;
+        
+        stateCSV << "Time[s],posX[m],posY[m],posZ[m],CoMX[m],CoMY[m],CoMZ[m],rolX[deg],rolY[deg],rolZ[deg],velX[m/s],velY[m/s],velZ[m/s],omegaX[rad/s],omegaY[rad/s],omegaZ[rad/s]" << endl;
+    
+        List<outerForceData>& outerForceDataList = objectData.outerForceDataList_;
+        List<innerForceData>& innerForceDataList = objectData.innerForceDataList_;
+        List<mooringData>& mooringDataList = objectData.mooringDataList_;
+    
+        if(outerForceDataList.size() || innerForceDataList.size() || mooringDataList.size())
+        {     
+            objectData.forceCSV_.reset(new OFstream("Bullet/" + objName + "Force.csv"));
+            OFstream& forceCSV = *objectData.forceCSV_;
+    
+            forceCSV << "Time[s],";
             
-            const word objName = objectData.objName_;
-
-            objectData.stateCSV_.reset(new OFstream("Bullet/" + objName + "State.csv"));
-            OFstream& stateCSV = *objectData.stateCSV_;
-            
-            stateCSV << "Time[s],posX[m],posY[m],posZ[m],CoMX[m],CoMY[m],CoMZ[m],rolX[deg],rolY[deg],rolZ[deg],velX[m/s],velY[m/s],velZ[m/s],omegaX[rad/s],omegaY[rad/s],omegaZ[rad/s]" << endl;
-
-            List<outerForceData>& outerForceDataList = objectData.outerForceDataList_;
-            List<innerForceData>& innerForceDataList = objectData.innerForceDataList_;
-            List<mooringData>& mooringDataList = objectData.mooringDataList_;
-
-            if(outerForceDataList.size() || innerForceDataList.size() || mooringDataList.size())
-            {     
-                objectData.forceCSV_.reset(new OFstream("Bullet/" + objName + "Force.csv"));
-                OFstream& forceCSV = *objectData.forceCSV_;
-
-                forceCSV << "Time[s],";
-                
-                forAll(outerForceDataList, i)
-                {
-                    forceCSV << "outer" << i << "ForceX[N],outer" << i << "ForceY[N],outer" << i << "ForceZ[N],outer" << i << "TorqueX[N*m],outer" << i << "TorqueY[N*m],outer" << i << "TorqueZ[N*m],";
-                }
-                
-                forAll(innerForceDataList, i)
-                {
-                    forceCSV << "inner" << i << "ForceX[N],inner" << i << "ForceY[N],inner" << i << "ForceZ[N],inner" << i << "TorqueX[N*m],inner" << i << "TorqueY[N*m],inner" << i << "TorqueZ[N*m],";
-                }
-
-                forAll(mooringDataList, i)
-                {
-                    forceCSV << "mooring" << i << "ForceX[N],mooring" << i << "ForceY[N],mooring" << i << "ForceZ[N],mooring" << i << "TorqueX[N*m],mooring" << i << "TorqueY[N*m],mooring" << i << "TorqueZ[N*m],";
-                }
-
-                forceCSV << "totalForceX[N],totalForceY[N],totalForceZ[N],totalTorqueX[N*m],totalTorqueY[N*m],totalTorqueZ[N*m]" << endl;
+            forAll(outerForceDataList, i)
+            {
+                forceCSV << "outer" << i << "ForceX[N],outer" << i << "ForceY[N],outer" << i << "ForceZ[N],outer" << i << "TorqueX[N*m],outer" << i << "TorqueY[N*m],outer" << i << "TorqueZ[N*m],";
             }
+            
+            forAll(innerForceDataList, i)
+            {
+                forceCSV << "inner" << i << "ForceX[N],inner" << i << "ForceY[N],inner" << i << "ForceZ[N],inner" << i << "TorqueX[N*m],inner" << i << "TorqueY[N*m],inner" << i << "TorqueZ[N*m],";
+            }
+    
+            forAll(mooringDataList, i)
+            {
+                forceCSV << "mooring" << i << "ForceX[N],mooring" << i << "ForceY[N],mooring" << i << "ForceZ[N],mooring" << i << "TorqueX[N*m],mooring" << i << "TorqueY[N*m],mooring" << i << "TorqueZ[N*m],";
+            }
+    
+            forceCSV << "totalForceX[N],totalForceY[N],totalForceZ[N],totalTorqueX[N*m],totalTorqueY[N*m],totalTorqueZ[N*m]" << endl;
         }
     }
 }
@@ -737,90 +734,87 @@ void Foam::physicsManager::prepareCSV()
 
 void Foam::physicsManager::writeCSV()
 {
-    if(Pstream::master())
+    forAll(objectDataList_, objI)
     {
-        forAll(objectDataList_, objI)
+        objectData& objectData = objectDataList_[objI];
+
+        OFstream& stateCSV = *objectData.stateCSV_;
+        
+        const scalar time = runTime_.value();
+        const vector pos = objectData.getPosition();
+        const vector CoM = objectData.getCoMWorld();
+
+        const tensor Q = objectData.getRotation();
+        scalar rolX, rolY, rolZ;
+        if (mag(Q.xx()) != 1.0) 
         {
-            objectData& objectData = objectDataList_[objI];
-
-            OFstream& stateCSV = *objectData.stateCSV_;
-            
-            const scalar time = runTime_.value();
-            const vector pos = objectData.getPosition();
-            const vector CoM = objectData.getCoMWorld();
-
-            const tensor Q = objectData.getRotation();
-            scalar rolX, rolY, rolZ;
-            if (mag(Q.xx()) != 1.0) 
+            rolY = -asin(Q.xz());
+            rolX = atan2(Q.yz()/cos(rolY), Q.zz()/cos(rolY));
+            rolZ = atan2(Q.xy()/cos(rolY), Q.xx()/cos(rolY));
+        } 
+        else 
+        {
+            rolZ = 0;
+            if (Q.xz() == -1)
             {
-                rolY = -asin(Q.xz());
-                rolX = atan2(Q.yz()/cos(rolY), Q.zz()/cos(rolY));
-                rolZ = atan2(Q.xy()/cos(rolY), Q.xx()/cos(rolY));
+                rolY = M_PI / 2;
+                rolX = rolZ + atan2(Q.yx(), Q.yz());
             } 
             else 
             {
-                rolZ = 0;
-                if (Q.xz() == -1)
-                {
-                    rolY = M_PI / 2;
-                    rolX = rolZ + atan2(Q.yx(), Q.yz());
-                } 
-                else 
-                {
-                    rolY = -M_PI / 2;
-                    rolX = -rolZ + atan2(-Q.yx(), -Q.yz());
-                }
+                rolY = -M_PI / 2;
+                rolX = -rolZ + atan2(-Q.yx(), -Q.yz());
+            }
+        }
+        
+        const vector rol = vector(rolX * 180.0 / M_PI,rolY * 180.0 / M_PI,rolZ * 180.0 / M_PI);   
+        
+        const vector vel = objectData.getVelocity();
+        const vector omega = objectData.getAngularVelocity();
+
+        stateCSV << time << "," << pos[0] << "," << pos[1] << "," << pos[2] << "," << CoM[0] << "," << CoM[1] << "," << CoM[2] << "," << rol[0] << "," << rol[1] << "," << rol[2] << ","
+            << vel[0] << "," << vel[1] << "," << vel[2] << "," << omega[0] << "," << omega[1] << "," << omega[2] << endl;
+
+        List<outerForceData>& outerForceDataList = objectData.outerForceDataList_;
+        List<innerForceData>& innerForceDataList = objectData.innerForceDataList_;
+        List<mooringData>& mooringDataList = objectData.mooringDataList_;
+
+        if(outerForceDataList.size() || innerForceDataList.size() || mooringDataList.size())
+        {    
+            OFstream& forceCSV = *objectData.forceCSV_;
+
+            forceCSV << runTime_.value() << ",";
+            
+            forAll(outerForceDataList, i)
+            {
+                forceData& forceData = outerForceDataList[i].forceData_;
+                const vector outerForce = forceData.force_;
+                const vector outerTorque = forceData.torque_;
+
+                forceCSV << outerForce[0] << "," << outerForce[1] << "," << outerForce[2] << "," << outerTorque[0] << "," << outerTorque[1] << "," << outerTorque[2] << ","; 
             }
             
-            const vector rol = vector(rolX * 180.0 / M_PI,rolY * 180.0 / M_PI,rolZ * 180.0 / M_PI);   
-            
-            const vector vel = objectData.getVelocity();
-            const vector omega = objectData.getAngularVelocity();
+            forAll(innerForceDataList, i)
+            {
+                forceData& forceData = innerForceDataList[i].forceData_;
+                const vector innerForce = forceData.force_;
+                const vector innerTorque = forceData.torque_;
 
-            stateCSV << time << "," << pos[0] << "," << pos[1] << "," << pos[2] << "," << CoM[0] << "," << CoM[1] << "," << CoM[2] << "," << rol[0] << "," << rol[1] << "," << rol[2] << ","
-                << vel[0] << "," << vel[1] << "," << vel[2] << "," << omega[0] << "," << omega[1] << "," << omega[2] << endl;
-
-            List<outerForceData>& outerForceDataList = objectData.outerForceDataList_;
-            List<innerForceData>& innerForceDataList = objectData.innerForceDataList_;
-            List<mooringData>& mooringDataList = objectData.mooringDataList_;
-
-            if(outerForceDataList.size() || innerForceDataList.size() || mooringDataList.size())
-            {    
-                OFstream& forceCSV = *objectData.forceCSV_;
-
-                forceCSV << runTime_.value() << ",";
-                
-                forAll(outerForceDataList, i)
-                {
-                    forceData& forceData = outerForceDataList[i].forceData_;
-                    const vector outerForce = forceData.force_;
-                    const vector outerTorque = forceData.torque_;
-
-                    forceCSV << outerForce[0] << "," << outerForce[1] << "," << outerForce[2] << "," << outerTorque[0] << "," << outerTorque[1] << "," << outerTorque[2] << ","; 
-                }
-                
-                forAll(innerForceDataList, i)
-                {
-                    forceData& forceData = innerForceDataList[i].forceData_;
-                    const vector innerForce = forceData.force_;
-                    const vector innerTorque = forceData.torque_;
-
-                    forceCSV << innerForce[0] << "," << innerForce[1] << "," << innerForce[2] << "," << innerTorque[0] << "," << innerTorque[1] << "," << innerTorque[2] << ","; 
-                }
-
-                forAll(mooringDataList, i)
-                {
-                    const vector mooringForce =  mooringDataList[i].mooringForce_;
-                    const vector mooringTorque =  mooringDataList[i].mooringTorque_;
-
-                    forceCSV << mooringForce[0] << "," << mooringForce[1] << "," << mooringForce[2] << "," << mooringTorque[0] << "," << mooringTorque[1] << "," << mooringTorque[2] << ","; 
-                }
-
-                const vector totalForce = objectData.totalFluidForce_ + objectData.totalMooringForce_;
-                const vector totalTorque = objectData.totalFluidTorque_ + objectData.totalMooringTorque_;
-                
-                forceCSV << totalForce[0] << "," << totalForce[1] << "," << totalForce[2] << "," << totalTorque[0] << "," << totalTorque[1] << "," << totalTorque[2] << endl; 
+                forceCSV << innerForce[0] << "," << innerForce[1] << "," << innerForce[2] << "," << innerTorque[0] << "," << innerTorque[1] << "," << innerTorque[2] << ","; 
             }
+
+            forAll(mooringDataList, i)
+            {
+                const vector mooringForce =  mooringDataList[i].mooringForce_;
+                const vector mooringTorque =  mooringDataList[i].mooringTorque_;
+
+                forceCSV << mooringForce[0] << "," << mooringForce[1] << "," << mooringForce[2] << "," << mooringTorque[0] << "," << mooringTorque[1] << "," << mooringTorque[2] << ","; 
+            }
+
+            const vector totalForce = objectData.totalFluidForce_ + objectData.totalMooringForce_;
+            const vector totalTorque = objectData.totalFluidTorque_ + objectData.totalMooringTorque_;
+            
+            forceCSV << totalForce[0] << "," << totalForce[1] << "," << totalForce[2] << "," << totalTorque[0] << "," << totalTorque[1] << "," << totalTorque[2] << endl; 
         }
     }
 }
