@@ -16,9 +16,21 @@ wmake $* ThirdParty/BulletSrc/BulletCollision
 wmake $* ThirdParty/BulletSrc/BulletDynamics
 
 if [ -d "ThirdParty/MoorDynSrc" ]; then
-    contents=$(find "ThirdParty/MoorDynSrc" -mindepth 1 ! -path "ThirdParty/MoorDynSrc/Make*" -print -quit)
+    requiredDirs=("Eigen" "Util" "Waves")
+    missing=0
 
-    if [ -z "$contents" ]; then
+    for dir in "${requiredDirs[@]}"; do
+        if [ ! -d "ThirdParty/MoorDynSrc/$dir" ]; then
+            echo "Missing required directory: $dir"
+            missing=1
+        fi
+    done
+
+    if [ "$missing" -eq 1 ]; then
+        echo "Cleaning folder (preserving Make/) and re-downloading..."
+
+        find ThirdParty/MoorDynSrc -mindepth 1 -not -path "ThirdParty/MoorDynSrc/Make*" -exec rm -rf {} +
+
         pushd ThirdParty/MoorDynSrc > /dev/null
 
         git init
@@ -27,17 +39,12 @@ if [ -d "ThirdParty/MoorDynSrc" ]; then
         echo "source" >> .git/info/sparse-checkout
         git pull origin master
 
-        # Move contents of 'source/' into current directory, then remove 'source/'
         mv source/* ./
         rm -r source
 
         popd > /dev/null
-    #else
-        #echo "Files/directories other than 'Make' found:"
-        #find "ThirdParty/MoorDynSrc" -mindepth 1 ! -path "ThirdParty/MoorDynSrc/Make*" -exec ls -ld {} \;
     fi
 fi
-
 
 wmake $* ThirdParty/MoorDynSrc
 
