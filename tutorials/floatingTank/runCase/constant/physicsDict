@@ -20,7 +20,7 @@ nIterBullet   10;
 
 //implicitEccentric true;
 
-//nOuterCorrectors 3; //when using innerForce option
+//nOuterCorrectors 3; //when using innerForce
 
 objects
 {    
