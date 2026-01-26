@@ -1,3 +1,3 @@
 # multiPhysicsSWInterFoam
-(docs/images/FOWTDinghy.png)
-(docs/images/waveFlumes.png)
+![FOWT Dinghy](docs/images/FOWTDinghy.png)
+![Wave Flumes](docs/images/waveFlumes.png)
