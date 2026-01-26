@@ -48,6 +48,7 @@ boundaryField
     cylinderSide
     {
         type            overset;
+        value           uniform (0 0 0);
     }
     cylinder
     {
