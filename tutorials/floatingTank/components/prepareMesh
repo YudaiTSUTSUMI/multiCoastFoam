@@ -1,0 +1,9 @@
+#!/bin/sh
+
+(cd cylinderOut && blockMesh && snappyHexMesh -overwrite)
+(cd cylinderOutOverset && blockMesh && surfaceFeatureExtract && snappyHexMesh -overwrite)
+(cd cylinderIn && blockMesh && surfaceFeatureExtract && snappyHexMesh -overwrite)
+
+mergeMeshes cylinderOut cylinderOutOverset -overwrite
+
+(cd cylinderOut && generateCellSets)

@@ -1,0 +1,24 @@
+#!/bin/sh
+
+SOURCE_DIR1="../components/cylinderOut/constant/polyMesh"
+TARGET_DIR1="constant/cylinderOut/polyMesh"
+
+rm -rf "$TARGET_DIR1"
+cp -r "$SOURCE_DIR1" "$TARGET_DIR1"
+
+echo "polyMesh copied from $SOURCE_DIR1 to $TARGET_DIR1"
+
+SOURCE_DIR2="../components/cylinderIn/constant/polyMesh"
+TARGET_DIR2="constant/cylinderIn/polyMesh"
+
+rm -rf "$TARGET_DIR2"
+cp -r "$SOURCE_DIR2" "$TARGET_DIR2"
+
+echo "polyMesh copied from $SOURCE_DIR2 to $TARGET_DIR2"
+
+
+rm -fr 0
+cp -r 0.org 0
+
+setFields -region cylinderOut
+setFields -region cylinderIn

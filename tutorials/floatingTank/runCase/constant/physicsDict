@@ -1,0 +1,66 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2306                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      physicsDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+//frictionMode  average;
+
+nIterBullet   10;
+
+//implicitEccentric true;
+
+objects
+{    
+    cylinder
+    {
+        objName         cylinder;
+        objShape        cylinderZ;
+
+        position    (0 0 0.125);
+
+        radius          0.05;
+        height          0.1;
+
+        // Density of the solid
+        rhoSolid       1190;
+        
+        restitution     0.0;
+        friction      0.5;
+        
+        fluidForceRelaxation 0.6;
+        fluidForceDamping    1;
+        
+        //initialVelocity     (0 0 0);
+        initialAngularVelocity  (0 0.628 0);
+
+        constraints
+        {
+        }
+        
+        writeVTK    true;
+        triSurface  (cylinder.stl cylinderIn.stl);
+    }
+}
+
+joints
+{
+}
+
+
+MoorDyn
+{
+}
+
+
+// ************************************************************************* //
