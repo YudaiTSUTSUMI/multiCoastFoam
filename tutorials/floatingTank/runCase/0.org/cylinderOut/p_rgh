@@ -23,6 +23,7 @@ boundaryField
     oversetPatch
     {
         type            overset;
+        value           uniform 0;
     }    
     XMax
     {
@@ -50,6 +51,7 @@ boundaryField
     cylinderSide
     {
         type            overset;
+        value           uniform 0;
     }
     cylinder
     {
