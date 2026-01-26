@@ -38,9 +38,17 @@ hU_(hU)
         
         word csvName = d.get<word>("waveSource");
         
-        word regionName = mesh_.name();
+        //dummy to get correct path
+        IOobject csvObj
+        (
+            csvName,
+            mesh_.time().constant(),
+            mesh_,
+            IOobject::MUST_READ,
+            IOobject::NO_WRITE
+        );
 
-        fileName csvDir = mesh_.time().constant() / regionName / csvName;
+        fileName csvDir = csvObj.path() / csvObj.name();
 
         csvArray csv(csvDir, true);
 
