@@ -259,7 +259,7 @@ void Foam::SWRiemannSolver::evaluateFlux
         hUFluxL = hUFluxLBase + SLeft*(hUmidR - HhURight - hULeft)*magSf;
         hUFluxR = hUFluxL + ThU;
     }
-    else if(SLeft < 0 && 0 < SRight && SmidL < 0 && SmidR == 0)
+    else if(SLeft < 0 && 0 < SRight && SmidL <= 0 && SmidR == 0)
     {
         hFluxR = hFluxRBase + SRight*(hmidL + Hh - hRight)*magSf;
         hFluxL = hFluxR;
