@@ -37,18 +37,8 @@ hU_(hU)
         const dictionary& d = e.dict();
         
         word csvName = d.get<word>("waveSource");
-        
-        //dummy to get correct path
-        IOobject csvObj
-        (
-            csvName,
-            mesh_.time().constant(),
-            mesh_,
-            IOobject::MUST_READ,
-            IOobject::NO_WRITE
-        );
 
-        fileName csvDir = csvObj.path() / csvObj.name();
+        fileName csvDir = waveSourceDict.path() / csvObj.name();
 
         csvArray csv(csvDir, true);
 
