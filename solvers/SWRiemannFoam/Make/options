@@ -1,0 +1,16 @@
+EXE_INC = \
+    -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I$(LIB_SRC)/OpenFOAM/lnInclude \
+    -I$(LIB_SRC)/meshTools/lnInclude \
+    -I../../src/SWRiemannSolver/lnInclude \
+    -I../../src/csvFunctions/lnInclude \
+    -I../../src/SWWaveSource/lnInclude  
+
+EXE_LIBS = \
+    -lfiniteVolume \
+    -lmeshTools \
+    -L$(FOAM_USER_LIBBIN) \
+    -lcsvFunctions \
+    -lSWRiemannSolver \
+    -lregionConnector \
+    -lSWWaveSource 
