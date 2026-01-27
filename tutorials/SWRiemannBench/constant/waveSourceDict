@@ -1,0 +1,32 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2306                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      waveSourecDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+
+wave1
+{
+    waveSource      "input.csv";
+    
+    sourceType      "line";
+    
+    pos1        (0.007 0 0.007);
+    pos2        (0.007 3.416 0.007);
+    
+    nSeg        500;
+    
+    //coeff       1;
+}
+
+// ************************************************************************* //
