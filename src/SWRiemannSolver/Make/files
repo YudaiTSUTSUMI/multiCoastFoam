@@ -1,3 +1,0 @@
-SWRiemannSolver.C
-
-LIB = $(FOAM_USER_LIBBIN)/libSWRiemannSolver
