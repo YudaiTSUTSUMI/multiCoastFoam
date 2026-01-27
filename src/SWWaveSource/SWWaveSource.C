@@ -52,9 +52,7 @@ hU_(hU)
         }
         
         scalar coeff = d.lookupOrDefault<scalar>("coeff",1);
-        
-        //Info << h << endl;
-        
+                
         word sourceType = d.get<word>("sourceType");
         
         //labelList hList;
@@ -84,7 +82,7 @@ hU_(hU)
                 }
                 else
                 {
-                    Info << "Warning: Point along line is outside the mesh!" << endl;
+                    //Info << "Warning: Point along line is outside the mesh!" << endl;
                 }
             }
         }
