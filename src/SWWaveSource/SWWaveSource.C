@@ -177,7 +177,7 @@ void Foam::SWWaveSource::update()
                 
                 h_[cellI] = hSet;
                 
-                hU_[cellI] *= 0;
+                //hU_[cellI] *= 0;
             }
         }
 
