@@ -356,6 +356,11 @@ void Foam::physicsManager::applyForces()
                     totalFluidForce = fDamp*(fRelax*totalFluidForce + (1-fRelax)*oldTotalFluidForce);
                     totalFluidTorque = fDamp*(fRelax*totalFluidTorque + (1-fRelax)*oldTotalFluidTorque);
                 }
+                else
+                {
+                    totalFluidForce = fDamp*totalFluidForce;
+                    totalFluidTorque = fDamp*totalFluidTorque;   
+                }
                 
                 objectData.totalFluidForce_ = totalFluidForce;
                 objectData.totalFluidTorque_ = totalFluidTorque;
@@ -375,7 +380,9 @@ void Foam::physicsManager::applyForces()
             
             applyForce = totalFluidForce + totalMooringForce;
             applyTorque = totalFluidTorque + totalMooringTorque;
-            
+
+            Info << "  appliedForce: " << applyForce << ", appliedTorque: " << applyTorque  <<  nl;
+
             bulletWorld_->applyForceTorque(objI, applyForce, applyTorque);
         }
     }
