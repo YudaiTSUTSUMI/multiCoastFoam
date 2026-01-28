@@ -1,4 +1,4 @@
 #!/bin/bash
 
 foamListTimes -rm
-foamListTimes -rm -processor
+rm -r processor*
