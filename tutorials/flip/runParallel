@@ -13,6 +13,6 @@ setFields -region box
 
 decomposePar -allRegions
 
-mpirun -np $NP overInterDyMFoam -parallel
+mpirun -np $NP overInterDyMFoam -parallel | tee solve.log
 
 #reconstructPar -allRegions
