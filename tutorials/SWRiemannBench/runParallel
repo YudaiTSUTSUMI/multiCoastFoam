@@ -13,6 +13,6 @@ setSW
 
 decomposePar
 
-mpirun -np $NP SWRiemannFoam -parallel
+mpirun -np $NP SWRiemannFoam -parallel | tee solve.log
 
 #reconstructPar
