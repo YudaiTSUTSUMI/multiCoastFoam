@@ -1,0 +1,14 @@
+#!/bin/sh
+
+(cd flume2D && blockMesh)
+(cd wavePaddle && blockMesh)
+
+(cd offshoreBreakwater && blockMesh && surfaceFeatureExtract && snappyHexMesh -overwrite)
+##(cd offShoreBreakwater && blockMesh && topoSet)
+
+(cd floatingBreakwater && blockMesh)
+(cd floatingBreakwaterOverset && blockMesh && snappyHexMesh -overwrite)
+
+mergeMeshes floatingBreakwater floatingBreakwaterOverset -overwrite
+
+(cd floatingBreakwater && generateCellSets)

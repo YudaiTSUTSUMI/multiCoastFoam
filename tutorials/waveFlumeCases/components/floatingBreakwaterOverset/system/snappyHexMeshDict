@@ -1,0 +1,122 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2306                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      snappyHexMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+castellatedMesh on;
+snap            off;
+addLayers       off;
+
+geometry
+{
+    FBW.stl
+    {
+        type triSurfaceMesh;
+        name FBW;
+    }
+}
+
+castellatedMeshControls
+{
+    maxLocalCells 100000;
+
+    maxGlobalCells 2000000;
+    
+    minRefinementCells 0;
+    
+    maxLoadUnbalance 0.10;
+    
+    nCellsBetweenLevels 1;
+        
+    resolveFeatureAngle 30;
+
+    planarAngle 30;
+    
+    features
+    (
+    );
+    
+    allowFreeStandingZoneFaces true;
+
+    refinementSurfaces
+    {
+        FBW
+        {
+            level (0 0);
+            patchInfo { type patch; }
+        }
+    }
+
+    refinementRegions
+    {
+    }
+    
+    locationInMesh (-1 0.35 0.5);
+}
+
+snapControls
+{
+    nSmoothPatch 3;
+     
+    tolerance 2.0;
+
+    nSolveIter 30;
+
+    nRelaxIter 5;
+    
+    nFeatureSnapIter 10;
+    
+    implicitFeatureSnap false;
+    
+    explicitFeatureSnap true;
+    
+    multiRegionFeatureSnap false;
+}
+
+meshQualityControls
+{
+    #include "meshQualityDict"
+
+    relaxed
+    {
+        maxNonOrtho 75;
+    }
+    
+    nSmoothScale 4;
+        
+    errorReduction 0.75;
+}
+
+
+addLayersControls
+{
+    layers
+    {
+    }
+
+    relativeSizes       true;
+    expansionRatio      1.2;
+    finalLayerThickness 0.5;
+    minThickness        1e-3;
+}
+
+
+writeFlags
+(
+);
+
+mergeTolerance 1e-6;
+
+
+// ************************************************************************* //
