@@ -15,16 +15,16 @@ FoamFile
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 
-SWFluidConnectors
+SWVOFConnectors
 {
 	connect1
 	{
 		mode fixed;
 		
 		SWRegion       flume2D;
-		fluidRegion    wavePaddle;
+		VOFRegion    wavePaddle;
 		
-		fluidPatch   outlet;		
+		VOFPatch   outlet;		
 	}
 	
 	connect2
@@ -32,9 +32,9 @@ SWFluidConnectors
 		mode fixed;
 		
 		SWRegion       flume2D;
-		fluidRegion    floatingBreakwater;
+		VOFRegion    floatingBreakwater;
 		
-		fluidPatch   inletOutlet;		
+		VOFPatch   inletOutlet;		
 	}
 	
 	connect2
@@ -42,9 +42,9 @@ SWFluidConnectors
 		mode fixed;
 		
 		SWRegion       flume2D;
-		fluidRegion    offshoreBreakwater;
+		VOFRegion    offshoreBreakwater;
 		
-		fluidPatch   inletOutlet;		
+		VOFPatch   inletOutlet;		
 	}
 }
 
