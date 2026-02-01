@@ -16,7 +16,7 @@ FoamFile
 
 regions
 (
-    fluid   ()
+    OIDF    ()
     SW      (flume2D)
     ola     (wavePaddle)
     laplacian ()
