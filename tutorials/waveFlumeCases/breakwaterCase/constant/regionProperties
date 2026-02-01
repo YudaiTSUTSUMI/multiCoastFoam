@@ -16,7 +16,7 @@ FoamFile
 
 regions
 (
-    fluid   (floatingBreakwater)
+    OIDF   (floatingBreakwater)
     SW      (flume2D)
     ola     (wavePaddle offshoreBreakwater)
     laplacian ()
