@@ -1,7 +1,7 @@
 scalarList deltaTList(SWRegions.size(),0);
 
 boolList limitFrontVelocitySW(SWRegions.size());
-List<dimensionedScalar> hDrySW(SWRegions.size());
+PtrList<dimensionedScalar> hDrySW(SWRegions.size());
 
 PtrList<volScalarField> hSW(SWRegions.size());
 PtrList<volScalarField> h0SW(SWRegions.size());
@@ -32,11 +32,15 @@ forAll(SWRegions, i)
 
     limitFrontVelocitySW[i] = SWProperties.lookupOrDefault("limitFrontVelocity", false);
 
-    hDrySW[i] = dimensionedScalar
+    hDrySW.set
     (
-        "hDry",
-        dimLength,
-        SWProperties.lookupOrDefault("hDry", SMALL)
+        i,
+        new dimensionedScalar
+        (
+            "hDry",
+            dimLength,
+            SWProperties.lookupOrDefault("hDry", SMALL)
+        )        
     );
 
     Info<< "Reading field h\n" << endl;
