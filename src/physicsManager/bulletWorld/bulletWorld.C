@@ -245,21 +245,21 @@ void Foam::bulletWorld::addSphereBody
 }
 
 
-void Foam::bulletWorld::addCylinderZBody
+void Foam::bulletWorld::addCylinderBody
 (
     const dictionary& dict,
     btAlignedObjectArray<btCollisionShape*> collisionShapes,
     bulletBody& btBody
 )
 {
+    const word axis = dict.get<word>("axis");
     const scalar radius = dict.get<scalar>("radius");
-    const scalar height = dict.get<scalar>("height");
+    const scalar height = dict.get<scalar>("height");    
     
     const vector position = dict.get<vector>("position");
     
     btBody.P() = position;
-    btBody.initialP() = position;
-    
+    btBody.initialP() = position;    
     
     const scalar eLength = dict.lookupOrDefault<scalar>("expansionLength", 0);
     const scalar rhoSolid = dict.get<scalar>("rhoSolid");
@@ -267,24 +267,43 @@ void Foam::bulletWorld::addCylinderZBody
     
     const scalar initialMass = rhoSolid * height * M_PI * pow(radius,2);
     
-    // add body to bullet world
-    btCollisionShape* cylinderShapeZCollision = new btCylinderShapeZ(btVector3(radius+eLength, radius+eLength, height/2+eLength));
-    
-    collisionShapes.push_back(cylinderShapeZCollision);
-    
-    btCollisionShape* cylinderShapeZ = new btCylinderShapeZ(btVector3(radius, radius, height/2));
+    btCollisionShape* cylinderShape = nullptr;
+    btCollisionShape* cylinderShapeCollision = nullptr;
 
+    if(axis == "x" || axis == "X")
+    {
+        cylinderShapeCollision = new btCylinderShapeX(btVector3(height/2 + eLength, radius + eLength, radius + eLength));
+        cylinderShape = new btCylinderShapeX(btVector3(height/2, radius, radius));
+    }
+    else if(axis == "y" || axis == "Y")
+    {
+        cylinderShapeCollision = new btCylinderShape(btVector3(radius + eLength, height/2 + eLength, radius + eLength));
+        cylinderShape = new btCylinderShape(btVector3(radius, height/2, radius));
+    }
+    else if(axis == "z" || axis == "Z")
+    {
+        cylinderShapeCollision = new btCylinderShapeZ(btVector3(radius + eLength, radius + eLength, height/2 + eLength));
+        cylinderShape = new btCylinderShapeZ(btVector3(radius, radius, height/2));
+    }
+    else
+    {
+        FatalErrorInFunction
+            << "Invalid axis value: " << axis
+            << ". Must be 'x', 'y', or 'z'."
+            << exit(FatalError);
+    }
+    
     /// Create Dynamic Objects
     btTransform startTransform;
     startTransform.setIdentity();
 
     btVector3 initialLocalInertia(0, 0, 0);
-    cylinderShapeZ->calculateLocalInertia(initialMass, initialLocalInertia);
+    cylinderShape->calculateLocalInertia(initialMass, initialLocalInertia);
     
     startTransform.setOrigin(btVector(position));
 
     btDefaultMotionState* motionState = new btDefaultMotionState(startTransform);
-    btRigidBody::btRigidBodyConstructionInfo rbInfo(initialMass, motionState, cylinderShapeZCollision, initialLocalInertia);
+    btRigidBody::btRigidBodyConstructionInfo rbInfo(initialMass, motionState, cylinderShapeCollision, initialLocalInertia);
     btRigidBody* body = new btRigidBody(rbInfo);
     
     setRigidBodyConditions(dict, body, btBody);
@@ -539,10 +558,10 @@ void Foam::bulletWorld::addBulletBodies
             btBody.shape() = "sphere";
             btBody.name() = objName;
         }
-        else if(shape == "cylinderZ")
+        else if(shape == "")
         {
-            addCylinderZBody(dict, collisionShapes_, btBody);
-            btBody.shape() = "cylinderZ";
+            addCylinderBody(dict, collisionShapes_, btBody);
+            btBody.shape() = "cylinder";
             btBody.name() = objName;
         }
         else if(shape == "compound")
@@ -934,7 +953,7 @@ void Foam::bulletWorld::stepSimulation
 {
     if(Pstream::master())
     {	    
-        dynamicsWorld_->stepSimulation(deltaT, maxSubSteps, fixedTimeStep);
+        dynamicsWorld_->stepSimulation(deltaT, maxSubSteps, fixedTimeStep); //call clearForces
         
         for (label i = 0; i < bulletBodies_.size(); i++)
         {
@@ -987,6 +1006,7 @@ void Foam::bulletWorld::storeStates()
             
             if(mag(bulletBodies_[i].CoMSolid()) > 0 || bulletBodies_[i].massFluid() > 0) // eccentric
             {
+                //setInertia, setCoM,
                 bulletBodies_[i].ev0() = foamVector(body->getEccentricLinearVelocity());
                 bulletBodies_[i].localCoM0() = bulletBodies_[i].localCoM();
                 bulletBodies_[i].inertiaTotal0() = bulletBodies_[i].inertiaTotal();
@@ -1061,9 +1081,9 @@ void Foam::bulletWorld::writeVTK
                     {
                         writeSphereVTK(objName, i, outputCounter);
                     }
-                    else if(objShape == "cylinderZ")
+                    else if(objShape == "cylinder")
                     {
-                        writeCylinderZVTK(objName, i, outputCounter);
+                        writeCylinderVTK(objName, i, outputCounter);
                     }
                     else if(objShape == "compound")
                     {
@@ -1094,11 +1114,13 @@ void Foam::bulletWorld::writeBoxVTK
     word saveName = "Bullet/" + objName + "/" + objName + "_" +  std::__cxx11::to_string(outputCounter);
     OFstream vtkFile(saveName + ".vtk");
     
+    // obtain Box shape
     const btBoxShape* box = dynamic_cast<const btBoxShape*>(obj->getCollisionShape());
 
     btVector3 halfExtents = box->getHalfExtentsWithMargin();
     btTransform transform = obj->getWorldTransform();
 
+    // calculate 8 points
     std::vector<btVector3> corners;
     for (int x = -1; x <= 1; x += 2) {
         for (int y = -1; y <= 1; y += 2) {
@@ -1109,16 +1131,19 @@ void Foam::bulletWorld::writeBoxVTK
         }
     }
 
+    // VTK header
     vtkFile << "# vtk DataFile Version 3.0\n";
     vtkFile << "Rigid body output\n";
     vtkFile << "ASCII\n";
     vtkFile << "DATASET POLYDATA\n";
 
+    // output point
     vtkFile << "POINTS 8 float\n";
     for (const auto& pt : corners) {
         vtkFile << pt.x() << " " << pt.y() << " " << pt.z() << "\n";
     }
 
+    // define face
     vtkFile << "POLYGONS 6 30\n";
     const int faces[6][4] = {
         {0, 1, 3, 2}, {4, 5, 7, 6},
@@ -1193,7 +1218,7 @@ void Foam::bulletWorld::writeSphereVTK
 }
 
 
-void Foam::bulletWorld::writeCylinderZVTK
+void Foam::bulletWorld::writeCylinderVTK
 (
     const word& objName,
     const int& objI,
@@ -1201,14 +1226,56 @@ void Foam::bulletWorld::writeCylinderZVTK
 )
 {
     btCollisionObject* obj = dynamicsWorld_->getCollisionObjectArray()[objI];
-    const btCylinderShapeZ* cylinder = dynamic_cast<const btCylinderShapeZ*>(obj->getCollisionShape());
+    btCollisionShape* shape = obj->getCollisionShape();
+
+    btVector3 halfExtents;
+    word axis = "z";
+
+    if (const btCylinderShapeZ* cylinderZ = dynamic_cast<const btCylinderShapeZ*>(shape))
+    {
+        halfExtents = cylinderZ->getHalfExtentsWithMargin();
+        axis = "z";
+    }
+    else if (const btCylinderShapeX* cylinderX = dynamic_cast<const btCylinderShapeX*>(shape))
+    {
+        halfExtents = cylinderX->getHalfExtentsWithMargin();
+        axis = "x";
+    }
+    else if (const btCylinderShape* cylinderY = dynamic_cast<const btCylinderShape*>(shape))
+    {
+        halfExtents = cylinderY->getHalfExtentsWithMargin();
+        axis = "y";
+    }
+    else
+    {
+        FatalErrorInFunction
+            << "Unsupported shape type for cylinder VTK output." << exit(FatalError);
+    }
+
+    btScalar radius, height;
+    int ax = 0, r1 = 1, r2 = 2; // default z-axis → height: z, radius: x/y
+
+    if (axis == "x")
+    {
+        height = halfExtents.x() * 2.0;
+        radius = halfExtents.y();
+        ax = 0; r1 = 1; r2 = 2;
+    }
+    else if (axis == "y")
+    {
+        height = halfExtents.y() * 2.0;
+        radius = halfExtents.x();
+        ax = 1; r1 = 0; r2 = 2;
+    }
+    else // z
+    {
+        height = halfExtents.z() * 2.0;
+        radius = halfExtents.x();
+        ax = 2; r1 = 0; r2 = 1;
+    }
 
     word saveName = "Bullet/" + objName + "/" + objName + "_" + std::to_string(outputCounter);
     OFstream vtkFile(saveName + ".vtk");
-
-    btVector3 halfExtents = cylinder->getHalfExtentsWithMargin();
-    btScalar radius = halfExtents.x();
-    btScalar height = halfExtents.z() * 2.0;
 
     btTransform transform = obj->getWorldTransform();
 
@@ -1217,21 +1284,26 @@ void Foam::bulletWorld::writeCylinderZVTK
 
     for (int i = 0; i < 2; ++i)
     {
-        btScalar z = (i == 0 ? -0.5 : 0.5) * height;
+        btScalar h = (i == 0 ? -0.5 : 0.5) * height;
+
         for (int j = 0; j < slices; ++j)
         {
             btScalar theta = 2.0 * M_PI * j / slices;
-            btVector3 p(
-                radius * cos(theta),
-                radius * sin(theta),
-                z
-            );
+            btVector3 p(0, 0, 0);
+            p[r1] = radius * cos(theta);
+            p[r2] = radius * sin(theta);
+            p[ax] = h;
+
             points.push_back(rotatePoint(p, transform));
         }
     }
 
-    points.push_back(rotatePoint(btVector3(0, 0, -0.5 * height), transform));
-    points.push_back(rotatePoint(btVector3(0, 0,  0.5 * height), transform));
+    // Add center points of bottom and top faces
+    btVector3 bottomCenter(0, 0, 0), topCenter(0, 0, 0);
+    bottomCenter[ax] = -0.5 * height;
+    topCenter[ax] = 0.5 * height;
+    points.push_back(rotatePoint(bottomCenter, transform));
+    points.push_back(rotatePoint(topCenter, transform));
 
     vtkFile << "# vtk DataFile Version 3.0\n";
     vtkFile << "Cylinder output\n";
@@ -1244,6 +1316,7 @@ void Foam::bulletWorld::writeCylinderZVTK
         vtkFile << pt.x() << " " << pt.y() << " " << pt.z() << "\n";
     }
 
+    // POLYGONS
     vtkFile << "POLYGONS " << slices * 4 << " " << slices * 4 * 4 << "\n";
     for (int j = 0; j < slices; ++j)
     {
@@ -1256,9 +1329,8 @@ void Foam::bulletWorld::writeCylinderZVTK
         vtkFile << "3 " << bottom0 << " " << top0 << " " << bottom1 << "\n";
         vtkFile << "3 " << bottom1 << " " << top0 << " " << top1 << "\n";
 
-        vtkFile << "3 " << points.size() - 2 << " " << bottom1 << " " << bottom0 << "\n";
-
-        vtkFile << "3 " << points.size() - 1 << " " << top0 << " " << top1 << "\n";
+        vtkFile << "3 " << points.size() - 2 << " " << bottom1 << " " << bottom0 << "\n"; // bottom face
+        vtkFile << "3 " << points.size() - 1 << " " << top0 << " " << top1 << "\n";       // top face
     }
 }
 
