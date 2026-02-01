@@ -35,7 +35,7 @@ Description
     The solver integrates the following components:
 
     1) 2D Shallow Water Equation (SW):
-       - Calculates wave propagation in shallow regions
+       - Calculates wave propagation across the entire computational domain
 
     2) 2D Laplace Equation (laplacian):
        - Solves pressure distribution in narrow micro gaps
