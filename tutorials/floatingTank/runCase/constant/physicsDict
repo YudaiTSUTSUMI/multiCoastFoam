@@ -27,10 +27,11 @@ objects
     cylinder
     {
         objName         cylinder;
-        objShape        cylinderZ;
+        objShape        cylinder;
 
         position     (0 0 -0.05);
 
+        axis            z;
         radius          0.05;
         height          0.1;
 
