@@ -69,48 +69,7 @@ void Foam::regionConnectors::setSWRegionData
         ),
         linearInterpolate(hU)
     );
-    
-    
-    const fvBoundaryMesh& fvp = SWMesh.boundary();
-
-    forAll(fvp, patchI)
-    { 
-        if (fvp[patchI].coupled()) 
-        {
-            SWData.faceType_->boundaryFieldRef().set
-            (
-                patchI,
-                fvsPatchField<scalar>::New
-                (
-                    "calculated",               
-                    SWMesh.boundary()[patchI],    
-                    *(SWData.faceType_)             
-                )
-            );
-            
-            SWData.hBound_->boundaryFieldRef().set
-            (
-                patchI,
-                fvsPatchField<scalar>::New
-                (
-                    "calculated",               
-                    SWMesh.boundary()[patchI],    
-                    *(SWData.hBound_)             
-                )
-            );
-            
-            SWData.hUBound_->boundaryFieldRef().set
-            (
-                patchI,
-                fvsPatchField<vector>::New
-                (
-                    "calculated",               
-                    SWMesh.boundary()[patchI],    
-                    *(SWData.hUBound_)             
-                )
-            );
-        }
-    }
+                
 }
 
 
