@@ -21,5 +21,5 @@ https://www.sciencedirect.com/science/article/pii/S0021999112003464
 
 <p align="center">
   <img src="docs/images/SWRiemann.png" width="45%">
-  <img src="docs/images/OTHER.png" width="45%">
+  <img src="docs/images/tsunamiNankaiTrough.png" width="45%">
 </p>
