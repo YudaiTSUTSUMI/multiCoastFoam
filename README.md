@@ -28,6 +28,5 @@ https://www.sciencedirect.com/science/article/pii/S0021999112003464
 overInterDyMFoam+ is a solver
 
 <p align="center">
-  <img src="docs/images/flip.png" width="45%">
-  <img src="docs/images/tsunamiNankaiTrough.png" width="45%">
+  <img src="docs/images/FOWT.png" width="75%">
 </p>
