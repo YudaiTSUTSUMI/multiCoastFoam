@@ -5,15 +5,15 @@
 
 void Foam::bulletWorld::createEmptyBulletWorld(const vector& gValue, const word& frictionMode)
 {
-    btDefaultCollisionConfiguration* collisionConfiguration = new btDefaultCollisionConfiguration();
+    collisionConfiguration_ = new btDefaultCollisionConfiguration();
 
-    btCollisionDispatcher* dispatcher = new btCollisionDispatcher(collisionConfiguration);
+    dispatcher_ = new btCollisionDispatcher(collisionConfiguration_);
 
-    btBroadphaseInterface* overlappingPairCache = new btDbvtBroadphase();
+    overlappingPairCache_ = new btDbvtBroadphase();
 
-    btSequentialImpulseConstraintSolver* solver = new btSequentialImpulseConstraintSolver;
+    solver_ = new btSequentialImpulseConstraintSolver;
     
-    dynamicsWorld_ = new btDiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, collisionConfiguration);
+    dynamicsWorld_ = new btDiscreteDynamicsWorld(dispatcher_, overlappingPairCache_, solver_, collisionConfiguration_);
     
     dynamicsWorld_->setGravity(btVector(gValue));
     
