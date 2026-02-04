@@ -20,8 +20,14 @@ class bulletWorld
     // Private data
     const dictionary dict_;
     PtrList<bulletBody> bulletBodies_;
+
+    btDefaultCollisionConfiguration* collisionConfiguration_;
+    btCollisionDispatcher* dispatcher_;
+    btBroadphaseInterface* overlappingPairCache_;
+    btSequentialImpulseConstraintSolver* solver_;
     btDiscreteDynamicsWorld* dynamicsWorld_;
     btAlignedObjectArray<btCollisionShape*> collisionShapes_;
+
     int numOfBulletBodies_;
     int outputCounter_;
     
@@ -145,7 +151,42 @@ public:
 
     //- Destructor
     ~bulletWorld()
-    {}
+    {
+        if(!Pstream::master())
+        {
+            return;
+        }
+
+        if (dynamicsWorld_)
+        {
+            for (int i = dynamicsWorld_->getNumCollisionObjects()-1; i >= 0; --i)
+            {
+                btCollisionObject* obj =
+                    dynamicsWorld_->getCollisionObjectArray()[i];
+
+                btRigidBody* body = btRigidBody::upcast(obj);
+
+                if (body && body->getMotionState())
+                {
+                    delete body->getMotionState();
+                }
+
+                dynamicsWorld_->removeCollisionObject(obj);
+                delete obj;
+            }
+        }
+
+        for (int i = 0; i < collisionShapes_.size(); i++)
+        {
+            delete collisionShapes_[i];
+        }
+
+        delete dynamicsWorld_;
+        delete solver_;
+        delete overlappingPairCache_;
+        delete dispatcher_;
+        delete collisionConfiguration_;
+    }
     
     const PtrList<bulletBody>& bulletBodies() const { return bulletBodies_; }
         
