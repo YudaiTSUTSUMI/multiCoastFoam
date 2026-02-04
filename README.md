@@ -5,7 +5,7 @@ It enables the flexible coupling of 2D shallow water equations (SWE) and 3D Navi
 <img src="docs/images/FOWTDinghy.png" width="100%">
 <img src="docs/images/waveFlumes.png" width="100%">
 
-# components
+# solvers
 ## SWRiemannFoam
 This solver is
 
