@@ -44,9 +44,11 @@ Description
        - Performs FSI simulations using overset mesh method
        - Models jointed and moored structures with internal fluid
 
-    4) olaFlow (based on Higuera et al., 2014) (ola):
-       - Supports advanced wave generation
-       - Simulates flow through porous structures such as breakwaters
+    4) olaFlow (Higuera et al., 2017)(ola):
+       - Provides advanced wave generation capabilities 
+       - Simulates wave interaction with porous structures such as breakwaters 
+       - Open-source OpenFOAM-based model (DOI: 10.5281/zenodo.1297013) 
+         https://github.com/phicau/olaFlow
 
 \*---------------------------------------------------------------------------*/
 
