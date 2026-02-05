@@ -53,9 +53,9 @@ The solver enables flexible coupling between a two-dimensional shallow water equ
 and a three-dimensional Navier–Stokes (NS) solver, allowing the simultaneous simulation of
 large-scale, long-period wave propagation and localized high-resolution flow interactions.
 
-The solver integrates the following components:
+The solver integrates the following numerical components:
 
-1) SWRiemannFoam:
+1) Two-dimensional Shallow Water Equations (SWRiemannFoam):
    - Computes large-scale wave propagation over the entire computational domain
 
 2) Two-dimensional Laplace Equation:
@@ -68,7 +68,7 @@ The solver integrates the following components:
 4) olaFlow (Higuera et al., 2017):
    - Provides advanced wave generation capabilities
    - Simulates wave interaction with porous structures such as breakwaters
-   - Open-source OpenFOAM-based model (DOI: 10.5281/zenodo.1297013)
+   - Open-source OpenFOAM-based CFD model (DOI: 10.5281/zenodo.1297013)
      https://github.com/phicau/olaFlow
 
 <p align="center">
