@@ -91,3 +91,6 @@ then run the following script:
     ./Allwmake
 
 Compilation has been tested and verified with OpenFOAM-v2512.
+
+## Related Publications
+The following publications are related to the development and application of the solvers in this repository:
