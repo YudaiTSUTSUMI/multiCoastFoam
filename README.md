@@ -8,10 +8,9 @@ It includes:
 
 Together, these solvers allow efficient modeling of large-scale wave propagation and localized, high-resolution flow interactions within a unified OpenFOAM framework.
 
-
-
 <img src="docs/images/FOWTDinghy.png" width="100%">
 
+---
 
 # solvers
 ## SWRiemannFoam
@@ -33,7 +32,7 @@ https://www.sciencedirect.com/science/article/pii/S0021999112003464
 </p>
 
 ## overInterDyMFoam+
-overInterDyMFoam+ is a solver
+overInterDyMFoam+ is a solver for
 
 Bullet Physics: https://github.com/bulletphysics/bullet3
 
@@ -44,7 +43,7 @@ MoorDyn: https://github.com/FloatingArrayDesign/MoorDyn
 </p>
 
 ## multiPhysicsSWInterFoam
-multiPhysicsSWInterFoam is a custom multi-physics solver built on OpenFOAM for coastal and ocean engineering applications.
+multiPhysicsSWInterFoam is a solver for a wide range of coastal and ocean engineering problems.
 
 The solver enables flexible coupling between a two-dimensional shallow water equation (SWE) solver
 and a three-dimensional Navier–Stokes (NS) solver, allowing the simultaneous simulation of
