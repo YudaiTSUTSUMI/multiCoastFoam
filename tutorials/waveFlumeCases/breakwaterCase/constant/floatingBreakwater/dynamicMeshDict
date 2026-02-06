@@ -24,7 +24,7 @@ solvers
         
         objName     FBW;
         
-        zoneID 0;
+        //zoneID 1;
 
         bulletMotionCoeffs
         {
