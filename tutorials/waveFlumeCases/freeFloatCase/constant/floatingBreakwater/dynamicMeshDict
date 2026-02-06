@@ -1,0 +1,59 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2306                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      dynamicMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dynamicFvMesh       bulletOversetFvMesh;
+
+solvers
+{
+    FBM
+    {                
+        mode        outerForce;
+        
+        objName     FBW;
+        
+        zoneID 1;
+
+        bulletMotionCoeffs
+        {
+
+            patches         (FBW);
+            innerDistance   100.0;
+            outerDistance   101.0;
+        }
+    }
+
+    inletOutlet
+    {                
+        mode        tracking;
+        
+        objName     FBW;
+        
+        zoneID 0;
+
+        normal  (1 1 0);  // default      
+        axis  (0 0 1);    //default
+
+        bulletMotionCoeffs
+        {
+
+            patches         (inletOutlet);
+            innerDistance   100.0;
+            outerDistance   101.0;
+        }
+    }
+}
+
+// ************************************************************************* //
