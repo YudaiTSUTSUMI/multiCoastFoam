@@ -68,7 +68,7 @@ The solver integrates the following numerical components:
 - **olaFlow (Higuera et al., 2017)**
    - Provides advanced wave generation capabilities
    - Simulates wave interaction with porous structures such as breakwaters
-   - [![DOI](https://zenodo.org/badge/114743636.svg)](https://zenodo.org/badge/latestdoi/114743636)
+   - DOI: [![DOI](https://zenodo.org/badge/114743636.svg)](https://zenodo.org/badge/latestdoi/114743636)
    - Repository: https://github.com/phicau/olaFlow
 
 <p align="center">
