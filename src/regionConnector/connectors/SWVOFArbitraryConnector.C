@@ -304,6 +304,8 @@ void Foam::SWVOFArbitraryConnector::createConnection()
                 }
             }
         }        
+
+        labelList SWCellType2 = SWCellType;
         
         forAll(SWFaceType, SWfi)
         {
@@ -312,14 +314,14 @@ void Foam::SWVOFArbitraryConnector::createConnection()
                 const label own = SWMesh.owner()[SWfi];
                 const label nei = SWMesh.neighbour()[SWfi];
                  
-                if(SWCellType[own] == 1 && SWCellType[nei] == -1)
+                if(SWCellType2[own] == 1 && SWCellType2[nei] == -1)
                 {
                     SWFaceType[SWfi] = 1;
                     SWCellType[nei] = 2;
                     
                     SWData.localFaceIDs_.append(SWfi);
                 }
-                else if(SWCellType[own] == -1 && SWCellType[nei] == 1)
+                else if(SWCellType2[own] == -1 && SWCellType2[nei] == 1)
                 {
                     SWFaceType[SWfi] = 1;
                     SWCellType[own] = 2;
