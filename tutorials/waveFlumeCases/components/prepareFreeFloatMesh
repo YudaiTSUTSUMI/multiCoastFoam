@@ -1,0 +1,8 @@
+#!/bin/sh
+
+(cd floatingBreakwater && blockMesh)
+(cd floatingBreakwaterOverset && blockMesh && snappyHexMesh -overwrite)
+
+mergeMeshes floatingBreakwater floatingBreakwaterOverset -overwrite
+
+(cd floatingBreakwater && generateCellSets)
