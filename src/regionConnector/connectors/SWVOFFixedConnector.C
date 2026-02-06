@@ -462,6 +462,8 @@ void Foam::SWVOFFixedConnector::createConnection()
             }
         }
             
+        labelList SWCellType2 = SWCellType;
+            
         forAll(SWFaceType, SWfi)
         {
             if(SWfi < SWMesh.nInternalFaces())
@@ -469,11 +471,11 @@ void Foam::SWVOFFixedConnector::createConnection()
                 const label own = SWMesh.owner()[SWfi];
                 const label nei = SWMesh.neighbour()[SWfi];
                  
-                if(SWCellType[own] == 1 && SWCellType[nei] == -1)
+                if(SWCellType2[own] == 1 && SWCellType2[nei] == -1)
                 {
                     SWCellType[nei] = 2;
                 }
-                else if(SWCellType[own] == -1 && SWCellType[nei] == 1)
+                else if(SWCellType2[own] == -1 && SWCellType2[nei] == 1)
                 {
                     SWCellType[own] = 2;
                 }     
