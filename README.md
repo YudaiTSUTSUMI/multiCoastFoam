@@ -39,6 +39,8 @@ and is extended to account for internal fluid motion within floating or moving s
 The integrated models include:
 - **Bullet Physics** for rigid-body dynamics and collision handling  
   https://github.com/bulletphysics/bullet3
+→ *Customized to account for mass redistribution due to internal fluid flow. Joint constraints are currently not compatible with this functionality. Joint handling is possible when assuming fixed eccentric mass.*
+  
 - **MoorDyn** for mooring system dynamics  
   https://github.com/FloatingArrayDesign/MoorDyn
 
