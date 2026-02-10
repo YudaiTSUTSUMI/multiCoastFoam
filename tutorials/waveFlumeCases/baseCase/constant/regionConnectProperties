@@ -27,6 +27,6 @@ SWVOFConnectors
 	}
 }
 
-fluidLaplacianConnectors
+VOFLaplacianConnectors
 {
 }
