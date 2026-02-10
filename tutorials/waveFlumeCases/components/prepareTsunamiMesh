@@ -1,5 +1,9 @@
 #!/bin/sh
 
+(cd flume2D && blockMesh)
+
+(cd solitaryWavePaddle && blockMesh)
+
 (cd cylinderRegion && blockMesh && surfaceFeatureExtract && snappyHexMesh -overwrite)
 
 (cd cylinderBottom && blockMesh && surfaceFeatureExtract && snappyHexMesh -overwrite)
