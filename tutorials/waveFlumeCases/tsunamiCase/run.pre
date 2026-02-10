@@ -2,7 +2,7 @@
 
 components=(
     flume2D
-    wavePaddle
+    solitaryWavePaddle
     cylinderRegion
     cylinderBottom
 )
@@ -21,4 +21,4 @@ rm -fr 0
 cp -r 0.org 0
 
 setSW -region flume2D
-setFields -region wavePaddle
+setFields -region solitaryWavePaddle
