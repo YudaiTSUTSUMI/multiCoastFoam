@@ -4,6 +4,6 @@ NP=8
 
 (cd components && ./prepareTsunamiMesh)
 (cd tsunamiCase && ./run.pre && rm -rf processor* && decomposePar -allRegions)
-(cd tsunamiCase && mpirun -np $NP multiPhysicsSWInterFoam -parallel | tee solve.log)
+(cd tsunamiCase && mpirun -np $NP multiCoastFoam -parallel | tee solve.log)
 
 #reconstructPar -allRegions
