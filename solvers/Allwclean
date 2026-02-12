@@ -2,4 +2,4 @@
 
 wclean $* SWRiemannFoam
 wclean $* overInterDyMFoamPlus
-wclean $* multiPhysicsSWInterFoam
+wclean $* multiCoastFoam
