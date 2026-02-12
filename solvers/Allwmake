@@ -2,4 +2,4 @@
 
 wmake $* SWRiemannFoam
 wmake $* overInterDyMFoamPlus
-wmake $* multiPhysicsSWInterFoam
+wmake $* multiCoastFoam
