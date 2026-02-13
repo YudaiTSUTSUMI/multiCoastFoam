@@ -96,7 +96,7 @@ However, all output data and log files are generated correctly, and the results 
 This issue is planned to be addressed in a future update.
 
 # compilation
-To compile multiCoastFoam, the genAbs module provided by olaFlow must be compiled beforehand.
+To compile multiCoastFoam, the [genAbs](https://github.com/phicau/olaFlow/tree/master/genAbs) module provided by olaFlow must be compiled beforehand.
 
 After loading the appropriate OpenFOAM environment, execute:
 
