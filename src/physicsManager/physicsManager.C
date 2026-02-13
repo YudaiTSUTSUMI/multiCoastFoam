@@ -750,7 +750,7 @@ void Foam::physicsManager::writeCSV()
         const scalar time = runTime_.value();
         const vector pos = objectData.getPosition();
         const vector CoM = objectData.getCoMWorld();
-        const vector rol = objectData.getRotationVector();  
+        const vector rol = objectData.getRotationVector()*180.0/M_PI;  
         
         const vector vel = objectData.getVelocity();
         const vector omega = objectData.getAngularVelocity();
