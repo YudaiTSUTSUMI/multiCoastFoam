@@ -168,7 +168,6 @@ void Foam::moorDynWorld::writeVTK(const int& outputCounter)
         // Writing tension (POINT_DATA)
         mps << "\nPOINT_DATA " << sum(nodesPerLine) << "\n";
         mps << "VECTORS tension_vector float" << endl;
-        mps << "LOOKUP_TABLE default\n";
 
         for (int i = 0; i < int(nLines); i++)
         {
