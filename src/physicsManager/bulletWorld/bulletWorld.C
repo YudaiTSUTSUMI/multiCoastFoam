@@ -1052,7 +1052,7 @@ void Foam::bulletWorld::restoreStates()
             bulletBodies_[i].q() = bulletBodies_[i].q0();
 			bulletBodies_[i].Q() = bulletBodies_[i].Q0();
             bulletBodies_[i].v() = bulletBodies_[i].v0();
-           	bulletBodies_[i].pi() = bulletBodies_[i].pi();
+           	bulletBodies_[i].pi() = bulletBodies_[i].pi0();
             
             btTransform trans(q0, p0);
             body->setCenterOfMassTransform(trans);
