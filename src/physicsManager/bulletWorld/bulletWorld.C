@@ -1047,6 +1047,12 @@ void Foam::bulletWorld::restoreStates()
             btQuaternion q0 = bulletBodies_[i].q0();
             btVector3 v0 = btVector(bulletBodies_[i].v0());
             btVector3 pi0 = btVector(bulletBodies_[i].pi0());
+
+			bulletBodies_[i].P() = bulletBodies_[i].P0();
+            bulletBodies_[i].q() = bulletBodies_[i].q0();
+			bulletBodies_[i].Q() = bulletBodies_[i].Q0();
+            bulletBodies_[i].v() = bulletBodies_[i].v0();
+           	bulletBodies_[i].pi() = bulletBodies_[i].pi();
             
             btTransform trans(q0, p0);
             body->setCenterOfMassTransform(trans);
@@ -1058,6 +1064,10 @@ void Foam::bulletWorld::restoreStates()
                 btVector3 ev0 = btVector(bulletBodies_[i].ev0());
                 btVector3 localCoM0 = btVector(bulletBodies_[i].localCoM0());
                 btMatrix3x3 inertiaTotal0 = btMatrix(bulletBodies_[i].inertiaTotal0());
+
+				bulletBodies_[i].ev() = bulletBodies_[i].ev0();
+				bulletBodies_[i].localCoM() = bulletBodies_[i].localCoM0();
+				bulletBodies_[i].inertiaTotal() = bulletBodies_[i].inertiaTotal0();
                 
                 body->setEccentricProperties(inertiaTotal0, localCoM0);
                 
