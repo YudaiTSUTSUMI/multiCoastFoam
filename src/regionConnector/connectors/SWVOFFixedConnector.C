@@ -677,7 +677,25 @@ void Foam::SWVOFFixedConnector::updateConnectBoundary()
         vector normal = SfSWGlobal[SWI]/mag(SfSWGlobal[SWI]);
         
         scalar VSW = (hUGlobal[SWI] & normal)/stabilise(hGlobal[SWI], SMALL);
-        scalar Fr = VSW/stabilise(Foam::sqrt(mag(g_)*hGlobal[SWI]), SMALL);
+        scalar VVOF = (hUVOF & normal)/stabilise(hVOF, SMALL);
+        
+        scalar FrSW = VSW/stabilise(Foam::sqrt(mag(g_)*hGlobal[SWI]), SMALL);
+        scalar FrVOF = VVOF/stabilise(Foam::sqrt(mag(g_)*hVOF), SMALL);
+        
+        scalar Fr = 0.0;
+        
+        if(FrSW >= 1 && FrVOF > -1)
+        {
+            Fr = FrSW;
+        }
+        else if(FrVOF <= -1 && FrSW < 1)
+        {
+            Fr = FrVOF;
+        }
+        else
+        {
+            Fr = (FrSW + FrVOF)*0.5;
+        }
         
         updateConnection
         (
