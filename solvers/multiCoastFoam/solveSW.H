@@ -1,15 +1,7 @@
 forAll(SWRegions, i)
 {
 	#include "setSWFields.H"     
-	
-	waveSource.update();
-	
-	Info << "compute " << SWNames[i] << " SWRiemannSolver flux" << endl;
-    riemannSolver.computeFlux();
-    		        
-    Info << "compute " << SWNames[i] << " SWRiemannSolver residue and update" << endl;
-    riemannSolver.computeResidue();
-    
+
     h = h - runTime.deltaT() * riemannSolver.hResidue();
 	hU = hU - runTime.deltaT() * riemannSolver.hUResidue();
 	
