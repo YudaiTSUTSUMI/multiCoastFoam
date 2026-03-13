@@ -107,7 +107,8 @@ int main(int argc, char *argv[])
         #include "multiregionCourantNo.H"
         #include "multiregionAlphaCourantNo.H"
         #include "setDeltaT.H"
-        
+
+        #include "updateSWFlux.H"
         
         ++runTime;
 
