@@ -55,6 +55,7 @@ class SWVOFArbitraryConnector
         
         vectorField SfBound_;
         vectorField CBound_;
+        vectorField pBound_;
         
         labelList globalIDs_; // local size, p0:[0, 1] p1:[2, 3, 4]
         
