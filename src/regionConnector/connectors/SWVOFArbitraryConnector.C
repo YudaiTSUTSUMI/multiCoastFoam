@@ -205,6 +205,7 @@ void Foam::SWVOFArbitraryConnector::createConnection()
     
     vectorField VOFCBoundGlobal = generateGlobalList(VOFData.CBound_);
     vectorField VOFSfBoundGlobal = generateGlobalList(VOFData.SfBound_);
+    vectorField VOFPBoundGlobal = generateGlobalList(VOFData.pBound_);
     
     VOFData.SWDonorProcCell_ = List<labelList>(VOFCBoundGlobal.size());    
     
@@ -261,7 +262,7 @@ void Foam::SWVOFArbitraryConnector::createConnection()
         
         // label for outside cell
         {
-            boundBox faceBB(VOFCBoundGlobal, true);
+            boundBox faceBB(VOFPBoundGlobal, true);
             
             faceBB.min().z() = -GREAT;
             faceBB.max().z() =  GREAT;
@@ -879,7 +880,23 @@ void Foam::SWVOFArbitraryConnector::update()
     
     VOFData.SfBound_ = VOFMesh->boundaryMesh()[VOFData.patchID_].faceAreas();
     VOFData.CBound_ = VOFMesh->boundaryMesh()[VOFData.patchID_].faceCentres();
+
+    {
+        DynamicList<vector> pBoundDyn;
     
+        forAll(VOFPatch, patchFacei)
+        {
+            const face& f = VOFPatch[patchFacei];
+    
+            forAll(f, pointi)
+            {
+                pBoundDyn.append(VOFMesh->points()[f[pointi]]);
+            }
+        }
+    
+        VOFData.pBound_ = vectorField(pBoundDyn);
+    }
+        
     vectorField VOFCBoundGlobal = generateGlobalList(VOFData.CBound_);
     vector VOFCNew = average(VOFCBoundGlobal);
     
