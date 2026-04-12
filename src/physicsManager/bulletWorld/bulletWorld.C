@@ -660,12 +660,37 @@ void Foam::bulletWorld::setHingeSelf
             FatalErrorInFunction << "Body not found: " << objName << abort(FatalError);
         }
 
-        btVector3 pivotInBody = btVector(jointDict.get<vector>("pivot"));
-        btVector3 axisInBody = btVector(jointDict.get<vector>("axis"));
-
         btRigidBody* body = btRigidBody::upcast(dynamicsWorld_->getCollisionObjectArray()[bodyIndex]);
 
-        btHingeConstraint* selfHinge = new btHingeConstraint(*body, pivotInBody, axisInBody);
+        const bool hasPivotLocal = jointDict.found("pivotLocal");
+        const bool hasPivotWorld = jointDict.found("pivotWorld");
+
+        if ((hasPivotLocal && hasPivotWorld) || (!hasPivotLocal && !hasPivotWorld))
+        {
+            FatalErrorInFunction
+                << "Specify one of pivotLocal or pivotWorld"
+                << abort(FatalError);
+        }
+
+        btVector3 pivotSetLocal;
+
+        if (hasPivotLocal)
+        {
+            pivotSetLocal = btVector(jointDict.get<vector>("pivotLocal"));
+        }
+        else if (hasPivotWorld)
+        {
+            btVector3 pivotWorld = btVector(jointDict.get<vector>("pivotWorld"));
+
+            // world -> local
+            const btTransform& bodyWorld = body->getWorldTransform();
+            pivotSetLocal = bodyWorld.inverse() * pivotWorld;
+        }
+
+        btVector3 axis = btVector(jointDict.get<vector>("axis"));
+        axis.normalize();        
+        
+        btHingeConstraint* selfHinge = new btHingeConstraint(*body, pivotSetLocal, axis);
 
         dynamicsWorld_->addConstraint(selfHinge, true);
     }
@@ -703,20 +728,77 @@ void Foam::bulletWorld::setHingePair
             FatalErrorInFunction<< "Choose correct body to joint" << abort(FatalError);
         }
         
-        btVector3 axisA = btVector(jointDict.get<vector>("axisA")); 
-        btVector3 axisB = btVector(jointDict.get<vector>("axisA")); 
-        btVector3 pivotA = btVector(jointDict.get<vector>("pivotA"));
-        btVector3 pivotB = btVector(jointDict.get<vector>("pivotB"));
-                                
-        btCollisionObject* bodyA = dynamicsWorld_->getCollisionObjectArray()[bodyAI];
-        btRigidBody* BodyA = btRigidBody::upcast(bodyA);
-        
-        btCollisionObject* bodyB = dynamicsWorld_->getCollisionObjectArray()[bodyBI];
-        btRigidBody* BodyB = btRigidBody::upcast(bodyB);
-        
-        btHingeConstraint* spHingeDynAB = new btHingeConstraint(*BodyA, *BodyB, pivotA, pivotB, axisA, axisB);
-        
-        dynamicsWorld_->addConstraint(spHingeDynAB, true);
+        btRigidBody* bodyA = btRigidBody::upcast(dynamicsWorld_->getCollisionObjectArray()[bodyAI]);
+        btRigidBody* bodyB = btRigidBody::upcast(dynamicsWorld_->getCollisionObjectArray()[bodyBI]);
+
+        if (!bodyA || !bodyB)
+        {
+            FatalErrorInFunction
+                << "One of the selected objects is not a rigid body"
+                << abort(FatalError);
+        }
+
+        const bool hasLocal =
+            jointDict.found("pivotA") &&
+            jointDict.found("pivotB") &&
+            jointDict.found("axisA")  &&
+            jointDict.found("axisB");
+
+        const bool hasWorld =
+            jointDict.found("pivotWorld") &&
+            jointDict.found("axisWorld");
+
+        if ((hasLocal && hasWorld) || (!hasLocal && !hasWorld))
+        {
+            FatalErrorInFunction
+                << "Specify either local setting "
+                << "(pivotA, pivotB, axisA, axisB) "
+                << "or world setting "
+                << "(pivotWorld, axisWorld)"
+                << abort(FatalError);
+        }
+
+        btVector3 pivotA;
+        btVector3 pivotB;
+        btVector3 axisA;
+        btVector3 axisB;
+
+        if (hasLocal)
+        {
+            pivotA = btVector(jointDict.get<vector>("pivotA"));
+            pivotB = btVector(jointDict.get<vector>("pivotB"));
+            axisA  = btVector(jointDict.get<vector>("axisA"));
+            axisB  = btVector(jointDict.get<vector>("axisB"));
+
+            axisA.normalize();
+            axisB.normalize();
+        }
+        else if (hasWorld)
+        {
+            btVector3 pivotWorld = btVector(jointDict.get<vector>("pivotWorld"));
+            btVector3 axisWorld  = btVector(jointDict.get<vector>("axisWorld"));
+
+            axisWorld.normalize();
+
+            const btTransform& worldA = bodyA->getWorldTransform();
+            const btTransform& worldB = bodyB->getWorldTransform();
+
+            // world -> local
+            pivotA = worldA.inverse() * pivotWorld;
+            pivotB = worldB.inverse() * pivotWorld;
+
+            // direction vector: rotation only
+            axisA = worldA.getBasis().inverse() * axisWorld;
+            axisB = worldB.getBasis().inverse() * axisWorld;
+
+            axisA.normalize();
+            axisB.normalize();
+        }
+
+        btHingeConstraint* hinge =
+            new btHingeConstraint(*bodyA, *bodyB, pivotA, pivotB, axisA, axisB);
+
+        dynamicsWorld_->addConstraint(hinge, true);
     }
 }
 
@@ -750,36 +832,67 @@ void Foam::bulletWorld::setGeneric6DoFJoint
         {
             FatalErrorInFunction<< "Choose correct body to joint" << abort(FatalError);
         }
+
+        btRigidBody* bodyA = btRigidBody::upcast
+        (
+            dynamicsWorld_->getCollisionObjectArray()[bodyAI]
+        );
+
+        btRigidBody* bodyB = btRigidBody::upcast
+        (
+            dynamicsWorld_->getCollisionObjectArray()[bodyBI]
+        );
+
+        const bool hasLocal = jointDict.found("frameInA") && jointDict.found("frameInB");
+        const bool hasWorld = jointDict.found("frameWorld");
+
+        if ((hasLocal && hasWorld) || (!hasLocal && !hasWorld))
+        {
+            FatalErrorInFunction
+                << "Specify either (frameInA, frameInB) or frameWorld"
+                << abort(FatalError);
+        }
         
-        btTransform frameInA, frameInB;
-        frameInA = btTransform::getIdentity();
-        frameInB = btTransform::getIdentity();
-        frameInA.setOrigin(btVector(jointDict.get<vector>("frameInA")));
-        frameInB.setOrigin(btVector(jointDict.get<vector>("frameInB")));
-                            
+
+        btTransform frameInA = btTransform::getIdentity();
+        btTransform frameInB = btTransform::getIdentity();
+
+        if (hasLocal)
+        {
+            frameInA.setOrigin(btVector(jointDict.get<vector>("frameInA")));
+            frameInB.setOrigin(btVector(jointDict.get<vector>("frameInB")));
+        }
+        else if (hasWorld)
+        {
+            btVector3 frameWorld = btVector(jointDict.get<vector>("frameWorld"));
+
+            frameInA.setOrigin(bodyA->getWorldTransform().inverse() * frameWorld);
+            frameInB.setOrigin(bodyB->getWorldTransform().inverse() * frameWorld);
+        }
+
         btVector3 linearLow = btVector(jointDict.lookupOrDefault<vector>("linearLimitLow", vector::zero));
         btVector3 linearHigh = btVector(jointDict.lookupOrDefault<vector>("linearLimitHigh", vector::zero));
         btVector3 angularLow = btVector(jointDict.lookupOrDefault<vector>("angularLimitLow", vector::zero));
         btVector3 angularHigh = btVector(jointDict.lookupOrDefault<vector>("angularLimitHigh", vector::zero));
-                                
-        btCollisionObject* bodyA = dynamicsWorld_->getCollisionObjectArray()[bodyAI];
-        btRigidBody* BodyA = btRigidBody::upcast(bodyA);
-        
-        btCollisionObject* bodyB = dynamicsWorld_->getCollisionObjectArray()[bodyBI];
-        btRigidBody* BodyB = btRigidBody::upcast(bodyB);
-                           
-        bool useLinearReferenceFrameA = true;
-        
-        btGeneric6DofConstraint* constraint = new btGeneric6DofConstraint(
-            *BodyA, *BodyB, frameInA, frameInB, useLinearReferenceFrameA);
-            
-        dynamicsWorld_->addConstraint(constraint, true);
 
-        // constraint
+        bool useLinearReferenceFrameA = true;
+
+        btGeneric6DofConstraint* constraint =
+            new btGeneric6DofConstraint
+            (
+                *bodyA,
+                *bodyB,
+                frameInA,
+                frameInB,
+                useLinearReferenceFrameA
+            );
+
         constraint->setLinearLowerLimit(linearLow);
         constraint->setLinearUpperLimit(linearHigh);
         constraint->setAngularLowerLimit(angularLow);
         constraint->setAngularUpperLimit(angularHigh);
+
+        dynamicsWorld_->addConstraint(constraint, true);
     }
 }
 
