@@ -75,6 +75,19 @@ struct trackingData
     tensor initialQ_;
 };
 
+//actuaters
+struct thrusterData
+{
+    vector positionLocal_;
+    vector directionLocal_;
+    scalar magnitude_;
+};
+
+struct motorData
+{
+    vector axisLocal_;
+    scalar magnitude_;
+};
 
 struct mooringData
 {
@@ -109,6 +122,10 @@ struct objectData
     List<innerForceData> innerForceDataList_;
     List<innerMassData> innerMassDataList_;
     List<trackingData> trackingDataList_;
+
+    //actuater
+    List<thrusterData> thrusterDataList_;
+    List<motorData> motorDataList_;
     
     List<mooringData> mooringDataList_;
 
