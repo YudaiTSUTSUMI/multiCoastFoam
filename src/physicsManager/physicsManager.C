@@ -52,6 +52,41 @@ void Foam::physicsManager::initBulletWorld(vector gValue)
         
         Info << "   initialPosition: " <<  objectData.getPosition()  << endl;
         Info << "   initialRotation: " <<  objectData.getRotation()  << endl;
+
+        //register actuators
+        if(objectDict.found("actuators"))
+        {
+            const dictionary& actuatorsDict = objectDict.subDict("actuators");
+            
+            for (const entry& actuatorsEntry : actuatorsDict)
+            {
+                const dictionary& actuatorsEntryDict = actuatorsEntry.dict();
+                
+                word actuatorType = actuatorsEntryDict.get<word>("type");
+                
+                if(actuatorType == "thruster")
+                {
+                    int thrusterNum = objectData.thrusterDataList_.size();
+                    objectData.thrusterDataList_.setSize(thrusterNum + 1);                  
+                    
+                    thrusterData& thrusterData = objectData.thrusterDataList_[thrusterNum];
+                    
+                    thrusterData.positionLocal_ = actuatorsEntryDict.get<vector>("positionLocal");
+                    thrusterData.directionLocal_ = actuatorsEntryDict.get<vector>("directionLocal");
+                    thrusterData.magnitude_ = actuatorsEntryDict.get<scalar>("magnitude");
+                }
+                else if(actuatorType == "motor")
+                {
+                    int motorNum = objectData.motorDataList_.size();
+                    objectData.motorDataList_.setSize(motorNum + 1);                  
+                    
+                    motorData& motorData = objectData.motorDataList_[motorNum];
+                    
+                    motorData.axisLocal_ = actuatorsEntryDict.get<vector>("axisLocal");
+                    motorData.magnitude_ = actuatorsEntryDict.get<scalar>("magnitude");
+                }
+            }
+        }
         
         objectNum++;
     }
@@ -314,9 +349,20 @@ void Foam::physicsManager::applyForces()
                 
         List<outerForceData>& outerForceDataList = objectData.outerForceDataList_;
         List<innerForceData>& innerForceDataList = objectData.innerForceDataList_;
+
         List<mooringData>& mooringDataList = objectData.mooringDataList_;
+
+        List<thrusterData>& thrusterDataList = objectData.thrusterDataList_;
+        List<motorData>& motorDataList = objectData.motorDataList_;
         
-        if(outerForceDataList.size() || innerForceDataList.size() || mooringDataList.size())
+        if
+        (
+            outerForceDataList.size()
+         || innerForceDataList.size()
+         || mooringDataList.size()
+         || thrusterDataList.size()
+         || motorDataList.size()
+        )    
         {        
             const scalar fRelax = objectData.fluidForceRelaxation_;
             const scalar fDamp = objectData.fluidForceDamping_;
@@ -332,6 +378,9 @@ void Foam::physicsManager::applyForces()
             
             vector totalMooringForce(Zero);
             vector totalMooringTorque(Zero);
+
+            vector totalActuatorForce(Zero);
+            vector totalActuatorTorque(Zero);
             
             //Fluid forces
             {
@@ -377,9 +426,40 @@ void Foam::physicsManager::applyForces()
                 objectData.totalMooringForce_ = totalMooringForce;
                 objectData.totalMooringTorque_ = totalMooringTorque;
             }
-            
-            applyForce = totalFluidForce + totalMooringForce;
-            applyTorque = totalFluidTorque + totalMooringTorque;
+
+            //actuators
+            {
+                //List<thrusterData>& thrusterDataList = objectData.thrusterDataList_;
+                //List<motorData>& motorDataList = objectData.motorDataList_;
+                forAll(thrusterDataList, i)
+                {
+                    vector positionLocal = thrusterDataList[i].positionLocal_;
+                    vector directionLocal = thrusterDataList[i].directionLocal_;
+                    scalar magnitude = thrusterDataList[i].magnitude_;
+                    
+                    const tensor Q = objectData.getRotation();
+                    const vector CoMLocal = objectData.getCoMLocal();
+                    
+                    vector forceWorld = magnitude * (Q & directionLocal);
+                    vector rWorld = Q & (positionLocal - CoMLocal);
+                    
+                    totalActuatorForce += forceWorld;
+                    totalActuatorTorque += rWorld ^ forceWorld;
+                }
+                
+                forAll(motorDataList, i)
+                {
+                    vector axisLocal = motorDataList[i].axisLocal_;
+                    scalar magnitude = motorDataList[i].magnitude_;
+                                        
+                    const tensor Q = objectData.getRotation();
+                    
+                    totalActuatorTorque += magnitude * (Q & axisLocal);
+                }
+            }
+
+            applyForce = totalFluidForce + totalMooringForce + totalActuatorForce;
+            applyTorque = totalFluidTorque + totalMooringTorque + totalActuatorTorque;
 
             Info << "  appliedForce: " << applyForce << ", appliedTorque: " << applyTorque  <<  nl;
 
