@@ -53,6 +53,34 @@ void Foam::bulletWorld::setRigidBodyConditions
     
     body->setActivationState(DISABLE_DEACTIVATION);
     //body->setSleepingThresholds(0.01f, 0.01f);
+
+	if(btBody.rhoSolid() == 0)
+    {
+        if(dict.found("motionFile"))
+        {        
+            body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);      
+            body->setActivationState(DISABLE_DEACTIVATION);               
+            btBody.kinematic() = true;
+            
+            word csvName = dict.get<word>("motionFile");
+
+            fileName csvDir = "constant" / csvName;
+
+            csvArray csv(csvDir, true); // true means to read headear
+
+            btBody.kinematicInfo_.motionData_ = csv.array();
+
+            if(!btBody.kinematicInfo_.motionData_.size())
+            {
+                FatalErrorInFunction
+                    << "Fail to read motionData: " << csvDir
+                    << abort(FatalError);
+            }
+            
+            btBody.kinematicInfo_.linearState0_ = btBody.P();
+            btBody.kinematicInfo_.angularState0_ = btBody.rotVec();
+        }
+    }
             
     setInitVelocity(dict, body);
         
@@ -1077,14 +1105,54 @@ void Foam::bulletWorld::applyForceTorque
 
 void Foam::bulletWorld::stepSimulation
 (
-    const scalar& deltaT,
+    const scalar& tNow,
+	const scalar& deltaT,
     const int& maxSubSteps,
     const scalar& fixedTimeStep
 )
 {
     if(Pstream::master())
     {	    
-        dynamicsWorld_->stepSimulation(deltaT, maxSubSteps, fixedTimeStep); //call clearForces
+		//update kinematic body state
+        for (label i = 0; i < bulletBodies_.size(); i++)
+        {
+            btCollisionObject* obj = dynamicsWorld_->getCollisionObjectArray()[i];
+	        btRigidBody* body = btRigidBody::upcast(obj);
+	        
+	        bulletBody& btBody = bulletBodies_[i];
+	        
+	        if(btBody.kinematic())
+	        {
+	            btBody.kinematicInfo_.updateKinematicState(tNow);
+	            
+	            btTransform T;
+                T.setIdentity();
+                
+                T.setOrigin(btVector(btBody.kinematicInfo_.linearState_));
+                
+                vector rotRad = btBody.kinematicInfo_.angularState_;  // (roll pitch yaw)
+
+                btQuaternion q;
+                q.setEulerZYX
+                (
+                    rotRad.z(),  // yaw
+                    rotRad.y(),  // pitch
+                    rotRad.x()   // roll
+                );                           
+                
+                T.setRotation(q);
+                
+                Info << btBody.kinematicInfo_.linearState_ << endl;
+
+                body->setWorldTransform(T);
+                if (body->getMotionState())
+                {
+                    body->getMotionState()->setWorldTransform(T);
+                }
+	        }
+        }        
+
+		dynamicsWorld_->stepSimulation(deltaT, maxSubSteps, fixedTimeStep); //call clearForces
         
         for (label i = 0; i < bulletBodies_.size(); i++)
         {
