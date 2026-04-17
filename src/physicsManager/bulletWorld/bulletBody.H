@@ -15,10 +15,39 @@ namespace Foam
 
 class bulletBody
 {
+    struct kinematicInfo
+    {
+        List<scalarList> motionData_;
+        
+        vector linearState_;
+        vector angularState_;
+        
+        vector linearState0_;
+        vector angularState0_;
+        
+        scalar wrapToPi
+        (
+            const scalar a
+        );
+        
+        scalar interpAngle
+        (
+            const scalar a0,
+            const scalar a1,
+            const scalar theta
+        );
+        
+        void updateKinematicState
+        (
+            scalar tNow
+        );
+    };    
+
     // Private data
     const dictionary& bodyDict_;
     
     bool dynamic_;
+    bool kinematic_ = false;
     
     word shape_; //box, sphere, cylinder...
     
@@ -98,7 +127,9 @@ public:
     //- Destructor
     ~bulletBody()
     {}
-    
+
+    kinematicInfo kinematicInfo_; 
+
     // Member Functions
     // Access
     inline const dictionary& bodyDict() const { return bodyDict_; }
@@ -127,14 +158,14 @@ public:
     inline const btQuaternion& q() const { return q_; }
     inline const btQuaternion& q0() const { return q0_; }
 
-    inline vector rotVec() const
+    inline vector rotVec() const //rad
     {
         btScalar angle = q_.getAngle();
         btVector3 axis = q_.getAxis();
         return vector(axis.x(), axis.y(), axis.z()) * angle;
     }
 
-    inline vector rotVec0() const
+    inline vector rotVec0() const //rad
     {
         btScalar angle = q0_.getAngle();
         btVector3 axis = q0_.getAxis();
