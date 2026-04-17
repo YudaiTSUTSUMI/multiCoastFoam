@@ -249,6 +249,7 @@ public:
     
     void stepSimulation
     (
+        const scalar& tNow,
         const scalar& deltaT,
         const int& maxSubSteps,
         const scalar& fixedTimeStep
