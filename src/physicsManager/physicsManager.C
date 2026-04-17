@@ -937,7 +937,7 @@ void Foam::physicsManager::update()
     
     Info << nl << "deltaT: "  << runTime_.deltaTValue()  << ", deltaT in Bullet: " << runTime_.deltaTValue()/nIterBullet_ << endl;
     
-    bulletWorld_->stepSimulation(runTime_.deltaTValue(), nIterBullet_, runTime_.deltaTValue()/nIterBullet_);
+    bulletWorld_->stepSimulation(runTime_.value(), runTime_.deltaTValue(), nIterBullet_, runTime_.deltaTValue()/nIterBullet_);
     
     forAll(objectDataList_, objI)
     {
