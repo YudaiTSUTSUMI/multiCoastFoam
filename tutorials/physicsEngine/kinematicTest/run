@@ -1,0 +1,5 @@
+#!/bin/bash
+
+mkdir 0
+
+overInterDyMFoamPlus | tee solve.log
