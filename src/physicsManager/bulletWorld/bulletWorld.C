@@ -1273,6 +1273,7 @@ void Foam::bulletWorld::writeVTK
             const bool writeVTK = bulletBodies_[i].writeVTK();
             const bool arbitrary = bulletBodies_[i].writeArbitraryVTK();
             const bool dynamic = bulletBodies_[i].dynamic();
+            const bool kinematic = bulletBodies_[i].kinematic();
             
             if((outputCounter == 0 && writeVTK) || (outputCounter > 0 && writeVTK && (dynamic || kinematic)))
             {
