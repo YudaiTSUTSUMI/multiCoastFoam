@@ -136,6 +136,8 @@ public:
 
     inline const bool& dynamic() const { return dynamic_; }
 
+    inline const bool& kinematic() const { return kinematic_; }
+
     inline const word& shape() const { return shape_; }
 
     inline const word& name() const { return name_; }
@@ -226,6 +228,8 @@ public:
     inline wordList& triSurfaceNames() { return triSurfaceNames_; }
 
     inline bool& dynamic() { return dynamic_; }
+
+    inline bool& kinematic() { return kinematic_; }
 
     inline vector& initialP() { return initialP_; }
 
