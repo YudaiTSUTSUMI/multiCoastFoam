@@ -1,0 +1,99 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2306                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      physicsDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+frictionMode  average; //minimum,average, default: multiply 
+
+nIterBullet   20;
+
+//implicitEccentric true;
+
+objects
+{    
+    floor
+    {
+        objName         floor;
+        objShape        box;
+
+        position    (0 0 -0.5);
+        
+        // Cuboid dimensions
+        Lx              1;
+        Ly              1;
+        Lz              1;
+
+        // Density of the solid
+        rhoSolid        0;
+        
+        restitution     0.0;
+        friction      0.0;
+
+        constraints
+        {
+        }
+        
+        writeVTK    true;
+    }
+    
+    rocket
+    {
+        objName         rocket;
+        objShape        box;
+
+        position    (0 0 0.05);
+        
+        // Cuboid dimensions
+        Lx              0.05;
+        Ly              0.05;
+        Lz              0.1;
+
+        // Density of the solid
+        rhoSolid        1000;
+        
+        restitution     0.0;
+        friction      0.0;
+        
+        constraints
+        {
+        }
+
+        actuators
+        {
+            thruster
+            {
+                type            thruster;
+                positionLocal   (0 0 -0.05); // CoM of rigid body
+                directionLocal  (0.001 0 1);
+                magnitude       2.5;
+            }
+        }
+        
+        writeVTK    true;
+
+        triSurface  (rocket.stl);
+    }
+}
+
+joints
+{
+}
+
+
+MoorDyn
+{
+}
+
+
+// ************************************************************************* //
