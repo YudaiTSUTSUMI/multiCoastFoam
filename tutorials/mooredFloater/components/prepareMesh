@@ -1,0 +1,12 @@
+#!/bin/sh
+
+(cd flume && blockMesh && snappyHexMesh -overwrite)
+(cd floaterOverset && blockMesh && snappyHexMesh -overwrite)
+(cd floaterOverset && transformPoints -translate "(0 0 -0.0164)")
+
+mergeMeshes flume floaterOverset -overwrite
+
+(cd flume && generateCellSets)
+
+(cd floaterInside && blockMesh)
+(cd floaterInside && transformPoints -translate "(0 0 -0.0164)")
