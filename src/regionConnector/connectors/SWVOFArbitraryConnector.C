@@ -880,22 +880,6 @@ void Foam::SWVOFArbitraryConnector::update()
     
     VOFData.SfBound_ = VOFMesh->boundaryMesh()[VOFData.patchID_].faceAreas();
     VOFData.CBound_ = VOFMesh->boundaryMesh()[VOFData.patchID_].faceCentres();
-
-    {
-        DynamicList<vector> pBoundDyn;
-    
-        forAll(VOFPatch, patchFacei)
-        {
-            const face& f = VOFPatch[patchFacei];
-    
-            forAll(f, pointi)
-            {
-                pBoundDyn.append(VOFMesh->points()[f[pointi]]);
-            }
-        }
-    
-        VOFData.pBound_ = vectorField(pBoundDyn);
-    }
         
     vectorField VOFCBoundGlobal = generateGlobalList(VOFData.CBound_);
     vector VOFCNew = average(VOFCBoundGlobal);
