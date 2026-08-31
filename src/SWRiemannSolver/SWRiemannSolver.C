@@ -25,7 +25,9 @@ void Foam::SWRiemannSolver::evaluateFlux
     const scalar& magg
 )
 {
-    // normal vector
+    const scalar eps = 1e-12;
+
+	// normal vector
     const vector n = Sf/magSf;
     const vector nt = vector(-n[1], n[0], 0.0);
 
@@ -150,18 +152,29 @@ void Foam::SWRiemannSolver::evaluateFlux
 	    SRight = SRroe;
 	}
     
-
-    scalar Hh = -S/stabilise(SLroe*SRroe, SMALL);
-    vector HhURight = -S/stabilise(SLroe*SRroe, SMALL)*qtLeft*nt;
-    vector HhULeft = -S/stabilise(SLroe*SRroe, SMALL)*qtRight*nt;
+	scalar Hh;
+    vector HhURight;
+    vector HhULeft;
+    
+    if (mag(SLroe*SRroe) < eps)
+    {
+        Hh = 0;
+        HhURight = vector::zero;
+        HhULeft = vector::zero;
+    }
+    else
+    {
+        Hh = -S/stabilise(SLroe*SRroe, SMALL);
+        HhURight = -S/stabilise(SLroe*SRroe, SMALL)*qtLeft*nt;
+        HhULeft = -S/stabilise(SLroe*SRroe, SMALL)*qtRight*nt;
+    }
     
     scalar denomR = hRight*(qRight - SRight) - hLeft*(qLeft - SLeft) + SLeft*Hh;
     scalar denomL = hRight*(qRight - SRight) - hLeft*(qLeft - SLeft) + SRight*Hh;
     
     scalar SmidR = 0.0;
     scalar SmidL = 0.0;
-    const scalar eps = 1e-12;
-    
+        
     if(mag(denomR) > eps && mag(SLeft) > 0)
     {
         SmidR = (SLeft*hRight*(qRight - SRight) - SRight*hLeft*(qLeft - SLeft) + SRight*SLeft*Hh)/denomR;
