@@ -556,8 +556,18 @@ void btHingeConstraint::getInfo2Internal(btConstraintInfo2* info, const btTransf
 			}
 			btScalar mot_fact = getMotorFactor(m_hingeAngle, lostop, histop, m_motorTargetVelocity, info->fps * currERP);
 			info->m_constraintError[srow] += mot_fact * m_motorTargetVelocity * m_referenceSign;
-			info->m_lowerLimit[srow] = -m_maxMotorImpulse;
-			info->m_upperLimit[srow] = m_maxMotorImpulse;
+				
+				//changed
+				btScalar maxMotorImpulse = m_maxMotorImpulse;
+
+				if(m_maxMotorTorque)
+				{
+					btScalar timeStep = 1/info->fps; //see 1256 btSequentialImpulseConstraintSolver.cpp 
+					maxMotorImpulse = m_maxMotorTorque * timeStep;
+				}
+
+				info->m_lowerLimit[srow] = -maxMotorImpulse;
+				info->m_upperLimit[srow] = maxMotorImpulse;
 		}
 		if (limit)
 		{
@@ -942,8 +952,18 @@ void btHingeConstraint::getInfo2InternalUsingFrameOffset(btConstraintInfo2* info
 			}
 			btScalar mot_fact = getMotorFactor(m_hingeAngle, lostop, histop, m_motorTargetVelocity, info->fps * currERP);
 			info->m_constraintError[srow] += mot_fact * m_motorTargetVelocity * m_referenceSign;
-			info->m_lowerLimit[srow] = -m_maxMotorImpulse;
-			info->m_upperLimit[srow] = m_maxMotorImpulse;
+			
+				//changed
+				btScalar maxMotorImpulse = m_maxMotorImpulse;
+
+				if(m_maxMotorTorque)
+				{
+					btScalar timeStep = 1/info->fps; //see 1256 btSequentialImpulseConstraintSolver.cpp 
+					maxMotorImpulse = m_maxMotorTorque * timeStep;
+				}
+
+				info->m_lowerLimit[srow] = -maxMotorImpulse;
+				info->m_upperLimit[srow] = maxMotorImpulse;
 		}
 		if (limit)
 		{
