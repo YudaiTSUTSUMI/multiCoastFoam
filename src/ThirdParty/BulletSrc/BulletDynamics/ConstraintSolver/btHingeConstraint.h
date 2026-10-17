@@ -88,6 +88,10 @@ public:
 
 	btScalar m_accMotorImpulse;
 
+		//new
+		bool m_enableAngularMotorTorque;
+		btScalar m_maxMotorTorque;
+
 	int m_flags;
 	btScalar m_normalCFM;
 	btScalar m_normalERP;
@@ -162,6 +166,14 @@ public:
 		m_motorTargetVelocity = targetVelocity;
 		m_maxMotorImpulse = maxMotorImpulse;
 	}
+
+		//new 
+		void enableAngularMotorTorque(bool enableMotorTorque, btScalar targetVelocity, btScalar maxMotorTorque)
+		{
+			m_enableAngularMotorTorque = enableMotorTorque;
+			m_motorTargetVelocity = targetVelocity;
+			m_maxMotorTorque = maxMotorTorque;
+		}
 
 	// extra motor API, including ability to set a target rotation (as opposed to angular velocity)
 	// note: setMotorTarget sets angular velocity under the hood, so you must call it every tick to
@@ -300,7 +312,14 @@ public:
 	}
 	inline bool getEnableAngularMotor()
 	{
-		return m_enableAngularMotor;
+		bool enableAngularMotor = false;
+
+		if(m_enableAngularMotor || m_enableAngularMotorTorque)
+		{
+			enableAngularMotor = true;
+		}
+		
+		return enableAngularMotor;
 	}
 	inline btScalar getMotorTargetVelocity()
 	{
