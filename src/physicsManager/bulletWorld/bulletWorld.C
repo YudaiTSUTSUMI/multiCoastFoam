@@ -718,9 +718,16 @@ void Foam::bulletWorld::setHingeSelf
         btVector3 axis = btVector(jointDict.get<vector>("axis"));
         axis.normalize();        
         
-        btHingeConstraint* selfHinge = new btHingeConstraint(*body, pivotSetLocal, axis);
+        btHingeConstraint* hingeSelf = new btHingeConstraint(*body, pivotSetLocal, axis);
 
-        dynamicsWorld_->addConstraint(selfHinge, true);
+        if(jointDict.found("targetVelocity"))
+        {
+            scalar targetVelocity = jointDict.get<scalar>("targetVelocity");
+            scalar maxMotorTorque = jointDict.get<scalar>("maxMotorTorque");
+            hingeSelf->enableAngularMotorTorque(true, targetVelocity, maxMotorTorque);
+        }
+
+        dynamicsWorld_->addConstraint(hingeSelf, true);
     }
 }
 
@@ -823,10 +830,17 @@ void Foam::bulletWorld::setHingePair
             axisB.normalize();
         }
 
-        btHingeConstraint* hinge =
+        btHingeConstraint* hingePair =
             new btHingeConstraint(*bodyA, *bodyB, pivotA, pivotB, axisA, axisB);
 
-        dynamicsWorld_->addConstraint(hinge, true);
+		if(jointDict.found("targetVelocity"))
+        {
+            scalar targetVelocity = jointDict.get<scalar>("targetVelocity");
+            scalar maxMotorTorque = jointDict.get<scalar>("maxMotorTorque");
+            hingePair->enableAngularMotorTorque(true, targetVelocity, maxMotorTorque);
+        }
+
+        dynamicsWorld_->addConstraint(hingePair, true);
     }
 }
 
