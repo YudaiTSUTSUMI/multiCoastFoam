@@ -60,7 +60,7 @@ joints
         axis (0 1 0);
 
         targetVelocity 0;
-        maxMotorTorque 0;
+        maxMotorTorque 10;
     }
 }
 
