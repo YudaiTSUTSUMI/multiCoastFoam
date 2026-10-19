@@ -100,7 +100,6 @@ To compile multiCoastFoam, the [genAbs](https://github.com/phicau/olaFlow/tree/m
 
 After loading the appropriate OpenFOAM environment, execute:
 
-   find . -type f -exec grep -Iq '^#!' {} \; -print | xargs chmod +x
     ./Allwmake
 
 Compilation has been tested and verified with OpenFOAM-v2506,v2512.
