@@ -15,6 +15,10 @@ wmake $* ThirdParty/BulletSrc/LinearMath
 wmake $* ThirdParty/BulletSrc/BulletCollision
 wmake $* ThirdParty/BulletSrc/BulletDynamics
 
+# ==========================================
+# MoorDyn
+# ==========================================
+
 if [ -d "ThirdParty/MoorDynSrc" ]; then
     requiredDirs=("Eigen" "Util" "Waves")
     missing=0
@@ -47,6 +51,47 @@ if [ -d "ThirdParty/MoorDynSrc" ]; then
 fi
 
 wmake $* ThirdParty/MoorDynSrc
+
+# ==========================================
+# olaFlow genAbs
+# ==========================================
+
+if [ ! -d "ThirdParty/genAbs" ]; then
+    mkdir -p ThirdParty/genAbs
+fi
+
+if [ ! -f "ThirdParty/genAbs/allMake" ]; then
+    echo "Downloading olaFlow genAbs..."
+
+    pushd ThirdParty/genAbs > /dev/null
+
+    git init
+    git remote add origin https://github.com/phicau/olaFlow.git
+    git config core.sparseCheckout true
+
+    echo "genAbs/" > .git/info/sparse-checkout
+
+    git pull origin master
+
+    mv genAbs/* ./
+    rmdir genAbs
+
+    popd > /dev/null
+fi
+
+if [ -f "ThirdParty/genAbs/allMake" ]; then
+    echo "Building olaFlow genAbs..."
+
+    pushd ThirdParty/genAbs > /dev/null
+
+    chmod +x allMake
+    ./allMake
+
+    popd > /dev/null
+else
+    echo "ERROR: genAbs/allMake not found"
+    exit 1
+fi
 
 wmake $* physicsManager/bulletWorld
 wmake $* physicsManager/moorDynWorld
